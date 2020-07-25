@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>案例篇|07.系统中出现大量不可中断进程和僵尸进程怎么办? (上) - zhuyhan的个人博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="zhuyhan" /><meta name="description" content="当iowait升高时，进程很可能因为得不到硬件的响应，而长时间处于不可中断状态.从ps或者top命令的输出中，可以发现它们都处于D状态，也就" /><meta name="keywords" content="blog, zhuyhan, 博客" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.69.0 with theme even" />
+
+
+<link rel="canonical" href="http://zhuyhan.github.io/post/linux_07/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="案例篇|07.系统中出现大量不可中断进程和僵尸进程怎么办? (上)" />
+<meta property="og:description" content="当iowait升高时，进程很可能因为得不到硬件的响应，而长时间处于不可中断状态.从ps或者top命令的输出中，可以发现它们都处于D状态，也就" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://zhuyhan.github.io/post/linux_07/" />
+<meta property="article:published_time" content="2020-05-29T20:59:14+08:00" />
+<meta property="article:modified_time" content="2020-05-29T20:59:14+08:00" />
+<meta itemprop="name" content="案例篇|07.系统中出现大量不可中断进程和僵尸进程怎么办? (上)">
+<meta itemprop="description" content="当iowait升高时，进程很可能因为得不到硬件的响应，而长时间处于不可中断状态.从ps或者top命令的输出中，可以发现它们都处于D状态，也就">
+<meta itemprop="datePublished" content="2020-05-29T20:59:14&#43;08:00" />
+<meta itemprop="dateModified" content="2020-05-29T20:59:14&#43;08:00" />
+<meta itemprop="wordCount" content="909">
+
+
+
+<meta itemprop="keywords" content="Linux," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="案例篇|07.系统中出现大量不可中断进程和僵尸进程怎么办? (上)"/>
+<meta name="twitter:description" content="当iowait升高时，进程很可能因为得不到硬件的响应，而长时间处于不可中断状态.从ps或者top命令的输出中，可以发现它们都处于D状态，也就"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">zhuyhan</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">zhuyhan</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">案例篇|07.系统中出现大量不可中断进程和僵尸进程怎么办? (上)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-05-29 </span>
+        <div class="post-category">
+            <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-进程状态">1. 进程状态</a></li>
+    <li><a href="#2不可中断进程和僵尸进程">2.不可中断进程和僵尸进程</a></li>
+    <li><a href="#3小结">3.小结</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <blockquote>
+<p>当iowait升高时，进程很可能因为得不到硬件的响应，而长时间处于不可中断状态.从ps或者top命令的输出中，可以发现它们都处于D状态，也就是不可中断状态</p>
+</blockquote>
+<h2 id="1-进程状态">1. 进程状态</h2>
+<p><strong>top命令输出的S列(status)表示进程状态：</strong></p>
+<ul>
+<li>R 是（Running或Runnable）的缩写，表示进程在CPU的就绪队列中，正在运行或者等待运行</li>
+<li>D 是（Disk Sleep）的缩写，也就是不可中断状态睡眠(Uninterruptible Sleep)，一般表示进程正在跟硬件交互，并且交互过程不允许被其他进程或中断打断。</li>
+<li>Z 是（Zombie）的缩写，它表示僵尸进程，也就是进程实际上已经结束了，但是父进程还没有回收它的资源</li>
+<li>S 是（Interruptible Sleep）的缩写，也就是可中断状态睡眠。表示进程因为等待某个事件 而被系统挂起。当进程等待的事件发生时，它会被唤醒并进入R状态。</li>
+<li>I 是 Idle 的缩写，也就是空闲状态，用在不可中断睡眠的内核线程上</li>
+<li>T 或者 t，也就是Stopped或Traced的缩写，表示进程处于暂停或者跟踪状态。</li>
+<li>X，也就是 Dead 的缩写，表示进程已经消亡。所以你不会在top或者ps命令中看到它。</li>
+</ul>
+<h2 id="2不可中断进程和僵尸进程">2.不可中断进程和僵尸进程</h2>
+<ul>
+<li>不可中断进程：如果系统或硬件发生了故障，进程可能会在不可中断状态保持很久，甚至导致系统中出 现大量不可中断进程</li>
+<li>僵尸进程：正常情况下，当一个进程创建了子进程后，它应该通过系统调用wait()或者waitpid()等待子进程结束，回收子进程的资源;而子进程在结束时，会向它的父进程发送 IGCHLD信号，所以，父进程还可以注册SIGCHLD信号的处理函数，异步回收资源。父进程没这么做，或是子进程执行太快，父进程还没来得及处理子进程状态，子进程就已经提前退出，那这时的子进程就会变成僵尸进程。</li>
+</ul>
+<h2 id="3小结">3.小结</h2>
+<p>不可中断状态，表示进程正在跟硬件交互，为了保护进程数据和硬件的一致性，系统不 允许其他进程或中断打断这个进程。进程长时间处于不可中断状态，通常表示系统有 I/O 性能问题。</p>
+<p>僵尸进程表示进程已经退出，但它的父进程还没有回收子进程占用的资源。短暂的僵尸 状态我们通常不必理会，但进程长时间处于僵尸状态，就应该注意了，可能有应用程序 没有正常处理子进程的退出。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">zhuyhan</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-05-29
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/linux/">Linux</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/linux_08/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">案例篇|08.系统中出现大量不可中断进程和僵尸进程怎么办? (下)</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/linux_06/">
+            <span class="next-text nav-default">案例篇|06.系统的CPU使用率很高，但为啥却找不到高CPU的应用?</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+  <div id="vcomments"></div>
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+  <script type="text/javascript">
+    new Valine({
+        el: '#vcomments' ,
+        appId: 's8UQ8qUnOnRymf9kHAU0g2bK-gzGzoHsz',
+        appKey: 'bnjf212fgMPtFgiOzTcUeSpp',
+        notify:  false ,
+        verify:  false ,
+        avatar:'mm',
+        placeholder: '说点什么吧...',
+        visitor:  false 
+    });
+  </script>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:527747622@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/zhuyhan" class="iconfont icon-github" title="github"></a>
+  <a href="http://zhuyhan.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">olOwOlo</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

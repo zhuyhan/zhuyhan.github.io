@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>案例篇（46～49篇） - zhuyhan的个人博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="zhuyhan" /><meta name="description" content="46.案例篇|为什么应用容器化后，启动慢了很多? 使用docker打包应用程序，部署，升级，带来一些性能降低、排错困难问题 排查问题： 查看容器状" /><meta name="keywords" content="blog, zhuyhan, 博客" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.69.0 with theme even" />
+
+
+<link rel="canonical" href="http://zhuyhan.github.io/post/linux_46/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="案例篇（46～49篇）" />
+<meta property="og:description" content="46.案例篇|为什么应用容器化后，启动慢了很多? 使用docker打包应用程序，部署，升级，带来一些性能降低、排错困难问题 排查问题： 查看容器状" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://zhuyhan.github.io/post/linux_46/" />
+<meta property="article:published_time" content="2020-07-12T14:57:33+08:00" />
+<meta property="article:modified_time" content="2020-07-12T14:57:33+08:00" />
+<meta itemprop="name" content="案例篇（46～49篇）">
+<meta itemprop="description" content="46.案例篇|为什么应用容器化后，启动慢了很多? 使用docker打包应用程序，部署，升级，带来一些性能降低、排错困难问题 排查问题： 查看容器状">
+<meta itemprop="datePublished" content="2020-07-12T14:57:33&#43;08:00" />
+<meta itemprop="dateModified" content="2020-07-12T14:57:33&#43;08:00" />
+<meta itemprop="wordCount" content="1854">
+
+
+
+<meta itemprop="keywords" content="Linux," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="案例篇（46～49篇）"/>
+<meta name="twitter:description" content="46.案例篇|为什么应用容器化后，启动慢了很多? 使用docker打包应用程序，部署，升级，带来一些性能降低、排错困难问题 排查问题： 查看容器状"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">zhuyhan</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">zhuyhan</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">案例篇（46～49篇）</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-07-12 </span>
+        <div class="post-category">
+            <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#46案例篇为什么应用容器化后启动慢了很多">46.案例篇|为什么应用容器化后，启动慢了很多?</a></li>
+    <li><a href="#4748案例篇服务器总是时不时丢包我该怎么办">47/48.案例篇|服务器总是时不时丢包，我该怎么办?</a>
+      <ul>
+        <li><a href="#1链路层">1.链路层</a></li>
+        <li><a href="#2网络层和传输层">2.网络层和传输层</a></li>
+        <li><a href="#3iptables">3.iptables</a></li>
+      </ul>
+    </li>
+    <li><a href="#49案例篇内核线程-cpu-利用率太高我该怎么-办">49.案例篇|内核线程 CPU 利用率太高，我该怎么 办?</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="46案例篇为什么应用容器化后启动慢了很多">46.案例篇|为什么应用容器化后，启动慢了很多?</h2>
+<blockquote>
+<p>使用docker打包应用程序，部署，升级，带来一些性能降低、排错困难问题</p>
+</blockquote>
+<p>排查问题：</p>
+<ol>
+<li>查看容器状态</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ docker ps -a
+</code></pre></td></tr></table>
+</div>
+</div><p>分析：如果容器处于Exited，说明容器已经退出</p>
+<ol start="2">
+<li>查看容器状态、退出码以及错误信息，确定容器退出原因</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 显示容器状态，jq 用来格式化 json 输出</span>
+$ docker inspect ubuntu -f <span class="s1">&#39;{{json .State}}&#39;</span> <span class="p">|</span> jq
+
+<span class="c1"># 打印</span>
+<span class="o">{</span><span class="s2">&#34;Status&#34;</span>:<span class="s2">&#34;running&#34;</span>,<span class="s2">&#34;Running&#34;</span>:true,<span class="s2">&#34;Paused&#34;</span>:false,<span class="s2">&#34;Restarting&#34;</span>:false,<span class="s2">&#34;OOMKilled&#34;</span>:false,<span class="s2">&#34;Dead&#34;</span>:false,<span class="s2">&#34;Pid&#34;</span>:1876,<span class="s2">&#34;ExitCode&#34;</span>:0,<span class="s2">&#34;Error&#34;</span>:<span class="s2">&#34;&#34;</span>,<span class="s2">&#34;StartedAt&#34;</span>:<span class="s2">&#34;2020-07-06T04:49:45.9801914Z&#34;</span>,<span class="s2">&#34;FinishedAt&#34;</span>:<span class="s2">&#34;2020-07-04T04:54:01.910248094Z&#34;</span><span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>分析：Status 容器状态，running表示正常运行</p>
+<ol start="3">
+<li>查看容器内部内存</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ docker <span class="nb">exec</span> ubuntu free - m
+</code></pre></td></tr></table>
+</div>
+</div><ol start="4">
+<li>用其他性能工具分析docker进程性能，比如pidstat</li>
+</ol>
+<h2 id="4748案例篇服务器总是时不时丢包我该怎么办">47/48.案例篇|服务器总是时不时丢包，我该怎么办?</h2>
+<blockquote>
+<p>网络丢包的情况贯穿了整个网络协议栈</p>
+</blockquote>
+<p><img src="/img/linux/linux-47-1.png" alt="网络丢包位置图"></p>
+<ul>
+<li>两台VM连接之间，可能会发生传输的错误，比如网络拥堵、线路错误</li>
+<li>在网卡收包后，可能会因为网络帧校验失败、Qos等而丢包</li>
+<li>在传输层，可能因为端口未建厅、资源占用超过内核限制等而丢包</li>
+<li>在套接字层，可能会因为套接字缓冲区溢出而丢包</li>
+<li>在应用层，可能会因为应用程序异常而丢包</li>
+<li>如果配置了iptables规则，这些网络包也可能因为iptables过滤规则而丢包。</li>
+</ul>
+<h3 id="1链路层">1.链路层</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># netstat -i</span>
+<span class="c1">#打印</span>
+Kernel Interface table
+Iface      MTU    RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg
+eth0      <span class="m">1500</span>   <span class="m">129325</span>      <span class="m">0</span>      <span class="m">0</span> <span class="m">0</span>         <span class="m">70347</span>      <span class="m">0</span>      <span class="m">0</span>      <span class="m">0</span> BMRU
+lo       <span class="m">65536</span>        <span class="m">6</span>      <span class="m">0</span>      <span class="m">0</span> <span class="m">0</span>             <span class="m">6</span>      <span class="m">0</span>      <span class="m">0</span>      <span class="m">0</span> LRU
+</code></pre></td></tr></table>
+</div>
+</div><p>注：</p>
+<ul>
+<li>输出中的 RX-OK、RX-ERR、RX-DRP、RX-OVR ，分别表示接收时的总包数、总错误数、进入 Ring Buffer 后因其他原因(如内存不足)导致的丢包数以及 Ring Buffer 溢出导致的丢包数。</li>
+<li>TX-OK、TX-ERR、TX-DRP、TX-OVR 指发送时对应的各个指标。</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"> $ tc -s qdisc show dev eth0
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="2网络层和传输层">2.网络层和传输层</h3>
+<p>使用netstat -s查看协议的收发汇总</p>
+<p><img src="/img/linux/linux-47-2.png" alt="netstat -s"></p>
+<h3 id="3iptables">3.iptables</h3>
+<blockquote>
+<p>iptables基于Netfilter框架，通过一系列的规则，对网络数据包进行过滤(如防火墙)和修改(如 NAT)。</p>
+</blockquote>
+<ol>
+<li>查看连接跟踪数</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 主机终端中查询内核配置</span>
+<span class="c1"># 最大连接跟踪数</span>
+$ sysctl net.netfilter.nf_conntrack_max
+<span class="c1"># 现存连接跟踪数</span>
+$ sysctl net.netfilter.nf_conntrack_count
+</code></pre></td></tr></table>
+</div>
+</div><ol start="2">
+<li>通过 iptables -nvL 命令，查看各条规则的统计信息</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ iptables -t filter -nvL
+</code></pre></td></tr></table>
+</div>
+</div><ol start="3">
+<li>tcpdump抓取端口的包</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ tcpdump -i eth0 -nn port <span class="m">80</span>
+<span class="c1"># 另外的终端执行curl命令</span>
+$ curl --max-time <span class="m">3</span> http://192.168.0.30/
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="49案例篇内核线程-cpu-利用率太高我该怎么-办">49.案例篇|内核线程 CPU 利用率太高，我该怎么 办?</h2>
+<p><strong>Linux 在启动过程中，有三个特殊的进程，也就是 PID 号最小的三个进程</strong></p>
+<ul>
+<li>0号进程为 idle 进程，这也是系统创建的第一个进程，它在初始化 1 号和 2 号进程后，演变 为空闲任务。当 CPU 上没有其他任务执行时，就会运行它。</li>
+<li>1号进程为 init 进程，通常是 systemd 进程，在用户态运行，用来管理其他用户态进程。</li>
+<li>2号进程为 kthreadd 进程，在内核态运行，用来管理内核线程。</li>
+</ul>
+<p>查看内核线程，要从2号进程开始</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ ps -f --ppid <span class="m">2</span> -p <span class="m">2</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>kswapd0:用于内存回收。</li>
+<li>kworker:用于执行内核工作队列，分为绑定CPU(名称格式为 kworker/CPU:ID)和未绑
+定 CPU(名称格式为 kworker/uPOOL:ID)两类。</li>
+<li>migration:在负载均衡过程中，把进程迁移到CPU上。每个CPU都有一个migration内核线程。
+jbd2/sda1-8:jbd 是 Journaling Block Device 的缩写，用来为文件系统提供日志功能，以 保证数据的完整性;名称中的 sda1-8，表示磁盘分区名称和设备号。每个使用了 ext4 文件系 统的磁盘分区，都会有一个 jbd2 内核线程。</li>
+<li>pdflush:用于将内存中的脏页(被修改过，但还未写入磁盘的文件页)写入磁盘(已经在 3.10 中合并入了 kworker 中)。</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 采样 30s 后退出</span>
+$ perf record -a -g -p <span class="m">9</span> -- sleep <span class="m">30</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>net_rx_action 和 netif_receive_skb，表明这是接收网络包(rx 表示 receive)。</li>
+<li>br_handle_frame ，表明网络包经过了网桥(br 表示 bridge)。</li>
+<li>br_nf_pre_routing ，表明在网桥上执行了 netfilter 的 PREROUTING(nf 表示 netfilter)。 而我们已经知道 PREROUTING 主要用来执行 DNAT，所以可以猜测这里有 DNAT 发生。</li>
+<li>br_pass_frame_up，表明网桥处理后，再交给桥接的其他桥接网卡进一步处理。比如，在新的网卡上接收网络包、执行 netfilter 过滤规则等等。
+<strong>火焰图</strong>
+<img src="/img/linux/linux-49-1.png" alt="火焰图"></li>
+<li>横轴表示采样数和采样比例。一个函数占用的横轴越宽，就代表它的执行时间越长。同一层的 多个函数，则是按照字母来排序。</li>
+<li>纵轴表示调用栈，由下往上根据调用关系逐个展开。换句话说，上下相邻的两个函数中，下面 的函数，是上面函数的父函数。这样，调用栈越深，纵轴就越高。</li>
+</ul>
+<p><strong>焰图可以分为下面这几种：</strong></p>
+<ul>
+<li>on-CPU火焰图:表示 CPU 的繁忙情况，用在 CPU 使用率比较高的场景中。</li>
+<li>off-CPU火焰图:表示 CPU 等待 I/O、锁等各种资源的阻塞情况。</li>
+<li>内存火焰图:表示内存的分配和释放情况。</li>
+<li>热/冷火焰图:表示将 on-CPU 和 off-CPU 结合在一起综合展示。</li>
+<li>差分火焰图:表示两个火焰图的差分情况，红色表示增长，蓝色表示衰减。差分火焰图常用来比较不同场景和不同时期的火焰图，以便分析系统变化前后对性能的影响情况。</li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">zhuyhan</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-07-12
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/linux/">Linux</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/linux_50/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">案例篇（50～58篇）</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/linux_43/">
+            <span class="next-text nav-default">43.套路篇|网络性能优化的几个思路</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+  <div id="vcomments"></div>
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+  <script type="text/javascript">
+    new Valine({
+        el: '#vcomments' ,
+        appId: 's8UQ8qUnOnRymf9kHAU0g2bK-gzGzoHsz',
+        appKey: 'bnjf212fgMPtFgiOzTcUeSpp',
+        notify:  false ,
+        verify:  false ,
+        avatar:'mm',
+        placeholder: '说点什么吧...',
+        visitor:  false 
+    });
+  </script>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:527747622@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/zhuyhan" class="iconfont icon-github" title="github"></a>
+  <a href="http://zhuyhan.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">olOwOlo</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

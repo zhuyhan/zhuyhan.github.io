@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>zhuyhan的个人博客</title>
+    <link>http://zhuyhan.github.io/</link>
+    <description>Recent content on zhuyhan的个人博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 20 Aug 2017 21:38:52 +0800</lastBuildDate>
+    
+	<atom:link href="http://zhuyhan.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>About</title>
+      <link>http://zhuyhan.github.io/about/</link>
+      <pubDate>Sun, 20 Aug 2017 21:38:52 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/about/</guid>
+      <description>Hugo is a static site engine written in Go.
+It makes use of a variety of open source projects including:
+ Cobra Viper J Walter Weatherman Cast  Learn more and contribute on GitHub.</description>
+    </item>
+    
+    <item>
+      <title>linux性能优化-学习总结</title>
+      <link>http://zhuyhan.github.io/post/linux_51/</link>
+      <pubDate>Sat, 25 Jul 2020 19:01:28 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_51/</guid>
+      <description>通过2个月的学习，断断续续看完了《linux性能优化实战》，学会cpu、内存、网络、文件系统、应用层等优化，也算是初步入门性能优化了。该课程</description>
+    </item>
+    
+    <item>
+      <title>案例篇（50～58篇）</title>
+      <link>http://zhuyhan.github.io/post/linux_50/</link>
+      <pubDate>Fri, 17 Jul 2020 01:20:39 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_50/</guid>
+      <description>50.案例篇|动态追踪怎么用?(上) 动态追踪技术，通过探针机制，来采集内核或者应用程序的运行信息，从而可以不用修改内核和应用程序的代码，就获</description>
+    </item>
+    
+    <item>
+      <title>案例篇（46～49篇）</title>
+      <link>http://zhuyhan.github.io/post/linux_46/</link>
+      <pubDate>Sun, 12 Jul 2020 14:57:33 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_46/</guid>
+      <description>46.案例篇|为什么应用容器化后，启动慢了很多? 使用docker打包应用程序，部署，升级，带来一些性能降低、排错困难问题 排查问题： 查看容器状</description>
+    </item>
+    
+    <item>
+      <title>43.套路篇|网络性能优化的几个思路</title>
+      <link>http://zhuyhan.github.io/post/linux_43/</link>
+      <pubDate>Mon, 06 Jul 2020 18:13:30 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_43/</guid>
+      <description>1. 确定优化目标 虽然网络性能优化的整体目标，是降低网络延迟(如 RTT)和提高吞吐量(如 BPS 和 PPS)，但具体到不同应用中，每个指标的优化标准可能</description>
+    </item>
+    
+    <item>
+      <title>41.案例篇|如何优化 NAT 性能?</title>
+      <link>http://zhuyhan.github.io/post/linux_41/</link>
+      <pubDate>Mon, 06 Jul 2020 18:09:45 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_41/</guid>
+      <description>NAT 原理 NAT技术可以重写IP数据包的源IP或者目的IP，被普遍地用来解决公网IP地址短缺的问题。 主要原理: 网络中的多台主机，通过共享同一个公</description>
+    </item>
+    
+    <item>
+      <title>36.套路篇|怎么评估系统的网络性能?</title>
+      <link>http://zhuyhan.github.io/post/linux_36/</link>
+      <pubDate>Mon, 06 Jul 2020 18:09:28 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_36/</guid>
+      <description>1.性能指标 带宽，表示链路的最大传输速率，单位是 b/s 吞吐量，表示没有丢包时的最大数据传输速率，单位通常为 b/s 延时，表示从网络请求发出后，一直到收</description>
+    </item>
+    
+    <item>
+      <title>35.基础篇|C10K 和 C1000K 回顾</title>
+      <link>http://zhuyhan.github.io/post/linux_35/</link>
+      <pubDate>Mon, 06 Jul 2020 18:09:20 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_35/</guid>
+      <description>C10K 就是单机同时处理 1 万个请 求(并发连接 1 万)的问题，而 C1000K 也就是单机支持处理 100 万个请求(并发连接 100 万)的问题。 I/O 模型优化 两种I/O事件通知的方</description>
+    </item>
+    
+    <item>
+      <title>34.关于 Linux 网络，你必须知道这些(下)</title>
+      <link>http://zhuyhan.github.io/post/linux_34/</link>
+      <pubDate>Sat, 27 Jun 2020 09:57:19 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_34/</guid>
+      <description>1.Linux的性能指标 带宽：表示链路的最大传输速率，单位 b/s 吞吐量：表示单位时间内成功传输的数量，单位 b/s；吞吐量受带宽限制，而吞吐量/带</description>
+    </item>
+    
+    <item>
+      <title>33.关于 Linux 网络，你必须知道这些(上)</title>
+      <link>http://zhuyhan.github.io/post/linux_33/</link>
+      <pubDate>Sat, 27 Jun 2020 09:57:16 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_33/</guid>
+      <description>1. 网络模型 1.1 OSI网络模型 应用层 表示层 会话层 传输层 网络层 数据链路层 物理层 1.2 TCP/IP网络模型 应用层，负责向用户提供一组应用程序 传输层，负责</description>
+    </item>
+    
+    <item>
+      <title>第四周 ——I/O性能(23~32)</title>
+      <link>http://zhuyhan.github.io/post/linux_week4/</link>
+      <pubDate>Sun, 21 Jun 2020 23:42:31 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_week4/</guid>
+      <description>1. 知识点归纳 1.1 Linux文件系统 每个文件的两种数据结构：索引节点、目录项 索引节点：用来记录文件的元数据 目录项：维护文件系统的树状结构 文件数据</description>
+    </item>
+    
+    <item>
+      <title>案例篇|26.如何找出狂打日志的“内鬼”?</title>
+      <link>http://zhuyhan.github.io/post/linux_26/</link>
+      <pubDate>Sun, 21 Jun 2020 23:13:49 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_26/</guid>
+      <description>案例 1.案例准备 1 $ docker run -v /tmp:/tmp --name=app -itd feisky/logapp 2.案例分析 步骤1.按1切换到每个CPU的使用情况和内存使用情况 1 $ top 步骤2. iostat分析磁盘使用情况</description>
+    </item>
+    
+    <item>
+      <title>基础篇|25.Linux 磁盘I/O是怎么工作的(下)</title>
+      <link>http://zhuyhan.github.io/post/linux_25/</link>
+      <pubDate>Sun, 21 Jun 2020 23:13:40 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_25/</guid>
+      <description>1. 磁盘性能指标 使用率，是指磁盘处理I/O的时间百分比。 饱和度，是指磁盘处理I/O的繁忙程度。 IOPS，(Input/Output Per Secon</description>
+    </item>
+    
+    <item>
+      <title>基础篇|24.Linux 磁盘I/O是怎么工作的(上)</title>
+      <link>http://zhuyhan.github.io/post/linux_24/</link>
+      <pubDate>Sun, 21 Jun 2020 23:13:34 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_24/</guid>
+      <description>1. 磁盘 磁盘是可以持久化存储的设备 根据存储介质的不同，常见磁盘可以分为两类:机械磁盘和固态磁盘。 机械磁盘，硬盘驱动器(Hard Disk Driver)</description>
+    </item>
+    
+    <item>
+      <title>基础篇|23.Linux 文件系统是怎么工作的?</title>
+      <link>http://zhuyhan.github.io/post/linux_23/</link>
+      <pubDate>Sun, 21 Jun 2020 23:13:27 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_23/</guid>
+      <description>目录项、索引节点、逻辑块以及超级块，构成了 Linux 文件系统的四大基本要。 1. 索引节点和目录项 文件系统，本身是对存储设备上的文件，进行组织管理的机制，</description>
+    </item>
+    
+    <item>
+      <title>第三周 ——内存性能(15~22)</title>
+      <link>http://zhuyhan.github.io/post/linux_week3/</link>
+      <pubDate>Sun, 14 Jun 2020 23:15:59 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_week3/</guid>
+      <description>本周学习了内存优化，对linux内存这一块内容需要再深入学习，补足基础知识。 打算用问答的方式总结知识点： linux内存的工作原理？ 虚拟内存空</description>
+    </item>
+    
+    <item>
+      <title>《Redis设计与实现》笔记</title>
+      <link>http://zhuyhan.github.io/post/the_design_implementation_of_redis/</link>
+      <pubDate>Wed, 10 Jun 2020 09:46:32 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/the_design_implementation_of_redis/</guid>
+      <description>第一章 引言 本书基于Redis 2.9 和 3.0来编写的 第一部分 “数据结构与对象” 第二部分 &amp;ldquo;单机数据库的实现&amp;rdquo; 第三部分 &amp;ldq</description>
+    </item>
+    
+    <item>
+      <title>第一周——CPU性能篇总结(02~07)</title>
+      <link>http://zhuyhan.github.io/post/linux_week1/</link>
+      <pubDate>Sun, 07 Jun 2020 20:52:48 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_week1/</guid>
+      <description>由于已经写了一篇第一阶段总结，那这部分是对第一周学习的一个补充。 1. 问题总结 什么是平均负载？平均负载为多少时合理？ 平均负载与CPU使用路的区分</description>
+    </item>
+    
+    <item>
+      <title>套路篇|21.如何“快准狠”找到系统内存的问题?</title>
+      <link>http://zhuyhan.github.io/post/linux_21/</link>
+      <pubDate>Thu, 04 Jun 2020 17:49:18 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_21/</guid>
+      <description>1. 内存性能指标 1.1 系统内存使用情况 已用内存：已经使用的内存 剩余内存：还未使用的内存 共享内存：通过tmpfs实现，高效率，df -h命令查看 可用内</description>
+    </item>
+    
+    <item>
+      <title>案例篇|19.为什么系统的Swap变高了(上)</title>
+      <link>http://zhuyhan.github.io/post/linux_19/</link>
+      <pubDate>Thu, 04 Jun 2020 11:28:12 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_19/</guid>
+      <description>1. 内存回收 内存紧张会导致：内存回收和OOM(out of memory)杀死进程 OOM:杀死占用大量进程的内存，释放这些内存，再分配给其他进程 内存</description>
+    </item>
+    
+    <item>
+      <title>案例篇|18.内存泄漏了，我该如何定位和处理?</title>
+      <link>http://zhuyhan.github.io/post/linux_18/</link>
+      <pubDate>Thu, 04 Jun 2020 11:28:08 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_18/</guid>
+      <description>1.内存的分配和回收 栈内存由系统自动分配和管理。变量一旦超出局部作用域就会被回收，不会出现内存泄漏 堆内存由应用程序自己来分配和管理。没有正确</description>
+    </item>
+    
+    <item>
+      <title>案例篇|17.如何利用系统缓存优化程序的运行效率?</title>
+      <link>http://zhuyhan.github.io/post/linux_17/</link>
+      <pubDate>Thu, 04 Jun 2020 11:28:05 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_17/</guid>
+      <description>1.缓存命中率 缓存命中率是直接通过缓存获取数据的请求次数，占所有数据请求次数的百分比。 命中率越高，表示使用缓存带来的收益越高，应用程序的性能</description>
+    </item>
+    
+    <item>
+      <title>基础篇|16.怎么理解内存中的Buffer和Cache?</title>
+      <link>http://zhuyhan.github.io/post/linux_16/</link>
+      <pubDate>Thu, 04 Jun 2020 11:28:00 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_16/</guid>
+      <description>1.buffer和cache Buffers是对原始磁盘块的临时存储，也就是缓存磁盘的数据(20MB左右) Cached 是从磁盘读取文件的页缓存，也就是用</description>
+    </item>
+    
+    <item>
+      <title>基础篇|15.Linux内存是怎么工作的?</title>
+      <link>http://zhuyhan.github.io/post/linux_15/</link>
+      <pubDate>Thu, 04 Jun 2020 11:27:57 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_15/</guid>
+      <description>1. 内存映射 内存映射：就是将虚拟内存地址映射到物理内存地址 多级页表：将内存分成区块来管理，将原来的映射关系改成区块索引和区块内的便宜 大页：比普</description>
+    </item>
+    
+    <item>
+      <title>第二周——CPU性能篇总结</title>
+      <link>http://zhuyhan.github.io/post/linux_14/</link>
+      <pubDate>Thu, 04 Jun 2020 11:27:52 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_14/</guid>
+      <description>看了一遍第一阶段的cpu性能篇，对cpu性能分析有一个大概的了解；由于遗忘的缘故，花了点时间重新阅读一遍，顺便写下第一阶段的总结。以前对li</description>
+    </item>
+    
+    <item>
+      <title>《娱乐至死》——尼尔·波兹曼</title>
+      <link>http://zhuyhan.github.io/post/book_01/</link>
+      <pubDate>Wed, 03 Jun 2020 22:56:40 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/book_01/</guid>
+      <description>我们将毁于 我们所热爱的东西！ “娱乐至死”这四个字，从高中时代就深刻印在我脑海里，那时对它的理解是人们沉浸于安逸、狂欢中导致危难。其实不是，作</description>
+    </item>
+    
+    <item>
+      <title>答疑|Linux 性能优化答疑(13、14篇)</title>
+      <link>http://zhuyhan.github.io/post/linux_13/</link>
+      <pubDate>Sun, 31 May 2020 11:08:00 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_13/</guid>
+      <description>重点概念 重调度中断是调度器用来分散任务到不同 CPU 的机制，也就是可以唤醒空闲状态的 CPU ，来调度新任务运行，而这通常借助处理器间中断(Inter-P</description>
+    </item>
+    
+    <item>
+      <title>套路篇|12.CPU 性能优化的几个思路</title>
+      <link>http://zhuyhan.github.io/post/linux_12/</link>
+      <pubDate>Sun, 31 May 2020 11:07:57 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_12/</guid>
+      <description>性能优化方法论 动手优化之前思考三个问题： 首先，既然要做性能优化，那要怎么判断它是不是有效呢?特别是优化后，到底能提升 多少性能呢? 第二，性能问</description>
+    </item>
+    
+    <item>
+      <title>套路篇|11.如何迅速分析出系统CPU的瓶颈在哪里?</title>
+      <link>http://zhuyhan.github.io/post/linux_11/</link>
+      <pubDate>Sun, 31 May 2020 11:07:54 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_11/</guid>
+      <description>【11套路篇】这篇文章比价干货满满，要时常复习 CPU性能指标 CPU 使用率 用户CPU使用率 系统CPU使用率 等待I/O的CPU使用率 软中断和硬中断的</description>
+    </item>
+    
+    <item>
+      <title>案例篇|10.系统的软中断CPU使用率升高，我该怎么办?</title>
+      <link>http://zhuyhan.github.io/post/linux_10/</link>
+      <pubDate>Sun, 31 May 2020 11:07:50 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_10/</guid>
+      <description>案例 工具 sar是一个系统活动报告工作，既可以实时查看系统的当前活动，又可以配置保存和报告历史统计数据 hping3 是一个可以构造 TCP/IP 协议数据包的工具，可以</description>
+    </item>
+    
+    <item>
+      <title>基础篇|09.怎么理解Linux软中断?</title>
+      <link>http://zhuyhan.github.io/post/linux_09/</link>
+      <pubDate>Sun, 31 May 2020 11:07:46 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_09/</guid>
+      <description>1. 概念 1.1 中断 中断是系统用来响应硬件设备请求的一种机制，它会打断进程的正常调度和执行，然后调用内核中的中断处理程序来响应设备的请求 中断其实是一</description>
+    </item>
+    
+    <item>
+      <title>案例篇|08.系统中出现大量不可中断进程和僵尸进程怎么办? (下)</title>
+      <link>http://zhuyhan.github.io/post/linux_08/</link>
+      <pubDate>Fri, 29 May 2020 20:59:18 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_08/</guid>
+      <description>iowait 分析 对于iowait升高的问题，首先要查询系统i/o情况，使用dstat工具可以同时查看cpu和i/o这两种资源的使用情况 步骤1.dsta</description>
+    </item>
+    
+    <item>
+      <title>案例篇|07.系统中出现大量不可中断进程和僵尸进程怎么办? (上)</title>
+      <link>http://zhuyhan.github.io/post/linux_07/</link>
+      <pubDate>Fri, 29 May 2020 20:59:14 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_07/</guid>
+      <description>当iowait升高时，进程很可能因为得不到硬件的响应，而长时间处于不可中断状态.从ps或者top命令的输出中，可以发现它们都处于D状态，也就</description>
+    </item>
+    
+    <item>
+      <title>案例篇|06.系统的CPU使用率很高，但为啥却找不到高CPU的应用?</title>
+      <link>http://zhuyhan.github.io/post/linux_06/</link>
+      <pubDate>Fri, 29 May 2020 12:51:22 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_06/</guid>
+      <description>1.案例场景 系统的用户 CPU 使用率（usr%）过高 没有 CPU 使用率高的进程 2.案例环境 本地系统：mac docker：docker镜像-cpu使用率过</description>
+    </item>
+    
+    <item>
+      <title>基础篇|05.某个应用的CPU使用率居然达到100%，我该怎么办?</title>
+      <link>http://zhuyhan.github.io/post/linux_05/</link>
+      <pubDate>Fri, 29 May 2020 01:23:42 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_05/</guid>
+      <description>Linux 作为一个多任务操作系统，将每个 CPU 的时间划分为很短的时间片，再通过调度器轮流分配给各个任务使用，因此造成多任务同时运行的错觉。 1.CPU使用</description>
+    </item>
+    
+    <item>
+      <title>基础篇|04.经常说的 CPU 上下文切换是什么意思?(下)</title>
+      <link>http://zhuyhan.github.io/post/linux_04/</link>
+      <pubDate>Thu, 28 May 2020 11:59:51 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_04/</guid>
+      <description>研究怎么分析CPU上下文切换的问题 1.怎么查看系统上下文切换情况 vmstat是一个常用的系统性能分析工具，主要用来分析系统内存使用情况，也用</description>
+    </item>
+    
+    <item>
+      <title>基础篇|03.经常说的 CPU 上下文切换是什么意思?(上)</title>
+      <link>http://zhuyhan.github.io/post/linux_03/</link>
+      <pubDate>Thu, 28 May 2020 11:58:46 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_03/</guid>
+      <description>1.什么是CPU上下文切换 就是先把前一个任务的CPU上下文（也就是CPU寄存器和程序计数器）保存起来，然后加载新任务的上下文到这些寄存器和程</description>
+    </item>
+    
+    <item>
+      <title>基础篇|02.平均负载</title>
+      <link>http://zhuyhan.github.io/post/linux_01/</link>
+      <pubDate>Thu, 28 May 2020 11:54:10 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/linux_01/</guid>
+      <description>什么是平均负载？ 平均负载指得是单位时间内，系统处于可运行状态和不可中断状态的平均进程数，也就是平均活跃进程数，它和CPU使用率没有直接关系 可</description>
+    </item>
+    
+    <item>
+      <title>JOIN语句实现和优化</title>
+      <link>http://zhuyhan.github.io/post/mysql_join/</link>
+      <pubDate>Sat, 25 Apr 2020 23:45:14 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/mysql_join/</guid>
+      <description>join语句会用到两个算法Index Nested-Loop和Block Nested—Loop;这里会介绍何时会用到这两种算法和优化方法 1.本</description>
+    </item>
+    
+    <item>
+      <title>golang的并发模型</title>
+      <link>http://zhuyhan.github.io/post/golang_model1/</link>
+      <pubDate>Sat, 25 Apr 2020 21:50:59 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/golang_model1/</guid>
+      <description>介绍两种golang常见的并发模型 1.生产者/消费者模型 生产者/消费者模型，包含两类线程。一种是生产者线程用于生产数据（成果队列），另外一种</description>
+    </item>
+    
+    <item>
+      <title>Mysql是怎样实现统计一张表行数</title>
+      <link>http://zhuyhan.github.io/post/mysql_count/</link>
+      <pubDate>Wed, 15 Apr 2020 12:54:58 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/mysql_count/</guid>
+      <description>开发时时如何统计一张表的总函数，一般是select count(*) form t,但是随着表数据大，会越查越慢 一、不同实现COUNT的方式 MyISAM引擎 查询整表总</description>
+    </item>
+    
+    <item>
+      <title>算法学习-排序</title>
+      <link>http://zhuyhan.github.io/post/algorithm-sort/</link>
+      <pubDate>Mon, 13 Apr 2020 12:11:44 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/algorithm-sort/</guid>
+      <description>简单排序 1.冒泡排序 原理： 对给定的数组进行多次遍历，每次比较相邻的两个数，如果前一个比后一个大，则交换 1 2 3 4 5 6 7 8 9 10 func bubbleSort(nums []int) []int { for i := 0;</description>
+    </item>
+    
+    <item>
+      <title>设计模式-单列模式</title>
+      <link>http://zhuyhan.github.io/post/design-patterns-singleton/</link>
+      <pubDate>Sat, 11 Apr 2020 16:42:16 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/design-patterns-singleton/</guid>
+      <description>单例对象的类必须保证只有一个实例存在，全局有唯一接口访问。 分类 懒汉模式：指全局的单例实例在第一次呗使用时构建 饿汉模式：指全局的单例在类装载时</description>
+    </item>
+    
+  </channel>
+</rss>

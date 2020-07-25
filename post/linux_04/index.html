@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>基础篇|04.经常说的 CPU 上下文切换是什么意思?(下) - zhuyhan的个人博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="zhuyhan" /><meta name="description" content="研究怎么分析CPU上下文切换的问题 1.怎么查看系统上下文切换情况 vmstat是一个常用的系统性能分析工具，主要用来分析系统内存使用情况，也用" /><meta name="keywords" content="blog, zhuyhan, 博客" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.69.0 with theme even" />
+
+
+<link rel="canonical" href="http://zhuyhan.github.io/post/linux_04/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="基础篇|04.经常说的 CPU 上下文切换是什么意思?(下)" />
+<meta property="og:description" content="研究怎么分析CPU上下文切换的问题 1.怎么查看系统上下文切换情况 vmstat是一个常用的系统性能分析工具，主要用来分析系统内存使用情况，也用" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://zhuyhan.github.io/post/linux_04/" />
+<meta property="article:published_time" content="2020-05-28T11:59:51+08:00" />
+<meta property="article:modified_time" content="2020-05-28T11:59:51+08:00" />
+<meta itemprop="name" content="基础篇|04.经常说的 CPU 上下文切换是什么意思?(下)">
+<meta itemprop="description" content="研究怎么分析CPU上下文切换的问题 1.怎么查看系统上下文切换情况 vmstat是一个常用的系统性能分析工具，主要用来分析系统内存使用情况，也用">
+<meta itemprop="datePublished" content="2020-05-28T11:59:51&#43;08:00" />
+<meta itemprop="dateModified" content="2020-05-28T11:59:51&#43;08:00" />
+<meta itemprop="wordCount" content="1474">
+
+
+
+<meta itemprop="keywords" content="Linux," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="基础篇|04.经常说的 CPU 上下文切换是什么意思?(下)"/>
+<meta name="twitter:description" content="研究怎么分析CPU上下文切换的问题 1.怎么查看系统上下文切换情况 vmstat是一个常用的系统性能分析工具，主要用来分析系统内存使用情况，也用"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">zhuyhan</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">zhuyhan</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">基础篇|04.经常说的 CPU 上下文切换是什么意思?(下)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-05-28 </span>
+        <div class="post-category">
+            <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#研究怎么分析cpu上下文切换的问题">研究怎么分析CPU上下文切换的问题</a>
+      <ul>
+        <li><a href="#1怎么查看系统上下文切换情况">1.怎么查看系统上下文切换情况</a></li>
+        <li><a href="#2案例分析">2.案例分析</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="研究怎么分析cpu上下文切换的问题">研究怎么分析CPU上下文切换的问题</h2>
+<h3 id="1怎么查看系统上下文切换情况">1.怎么查看系统上下文切换情况</h3>
+<blockquote>
+<p>vmstat是一个常用的系统性能分析工具，主要用来分析系统内存使用情况，也用来分析CPU上下文切换和中断次数</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 每隔5s输出一组数据</span>
+$  vmstat <span class="m">5</span>
+<span class="c1"># 打印</span>
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ <span class="m">5</span>  <span class="m">0</span>      <span class="m">0</span> <span class="m">1376000</span>  <span class="m">10384</span> <span class="m">335352</span>   <span class="m">0</span>    <span class="m">0</span>     <span class="m">1</span>     <span class="m">0</span>   <span class="m">97</span>    <span class="m">0</span>  <span class="m">0</span>  <span class="m">0</span> <span class="m">99</span>  <span class="m">0</span>  <span class="m">0</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>cs(context switch)是每秒上下文切换次数</li>
+<li>in(interrupt)则是每秒中断的次数</li>
+<li>r(running or runnable)是就绪队列的长度，也就是正在运行和等待CPU的进程数。</li>
+<li>b(blocked)则是处于不可中断睡眠状态的进程数。</li>
+</ul>
+<blockquote>
+<p>pidstat -w 可以查看每个进程上下文切换的情况</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 每隔5s输出一组数据</span>
+$ pidstat -w <span class="m">5</span>
+<span class="c1"># 打印</span>
+Linux 4.19.76-linuxkit <span class="o">(</span>4f913ef1ae8f<span class="o">)</span> 	05/27/20 	_x86_64_	<span class="o">(</span><span class="m">4</span> CPU<span class="o">)</span>
+
+16:01:26      UID       PID   cswch/s nvcswch/s  Command
+16:01:31        <span class="m">0</span>        <span class="m">27</span>      0.20      0.00  pidstat
+
+16:01:31      UID       PID   cswch/s nvcswch/s  Command
+16:01:36        <span class="m">0</span>        <span class="m">27</span>      0.20      0.00  pidstat
+
+</code></pre></td></tr></table>
+</div>
+</div><p>cswch ，表示每秒自愿上下文切换 (voluntary context switches)的次数</p>
+<p>nvcswch ，表示每秒非自愿上下文 切换(non voluntary context switches)的次数。</p>
+<p><strong>自愿上下文切换</strong>，是指进程无法获取所需资源，导致的上下文切换。比如说， I/O、内存等系统资源不足时，就会发生自愿上下文切换。</p>
+<p><strong>非自愿上下文切换</strong>，则是指进程由于时间片已到等原因，被系统强制调度，进而发生 的上下文切换。比如说，大量进程都在争抢 CPU 时，就容易发生非自愿上下文切换。</p>
+<h3 id="2案例分析">2.案例分析</h3>
+<p><strong>工具：</strong> sysbench
+<strong>用户权限：</strong> root</p>
+<p><strong>操作：</strong>
+步骤1. 在第一个终端运行sysbench，模拟系统多线程调度瓶颈</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 以10个线程运行5min的基准测试，模拟多线程切换的问题</span>
+$ sysbench --threads<span class="o">=</span><span class="m">10</span> --max-time<span class="o">=</span><span class="m">300</span> threads run
+</code></pre></td></tr></table>
+</div>
+</div><p>步骤2. 在第二个终端运行vmstat，观察上下文切换情况</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 每隔1s输出1组数据</span>
+$ vmstat <span class="m">1</span>
+<span class="c1"># 打印</span>
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+<span class="m">12</span>  <span class="m">0</span>      <span class="m">0</span> <span class="m">1357028</span>  <span class="m">10408</span> <span class="m">349740</span>    <span class="m">0</span>    <span class="m">0</span>     <span class="m">1</span>     <span class="m">0</span>  <span class="m">105</span>   <span class="m">40</span>  <span class="m">0</span>  <span class="m">1</span> <span class="m">99</span>  <span class="m">0</span>  <span class="m">0</span>
+ <span class="m">9</span>  <span class="m">0</span>      <span class="m">0</span> <span class="m">1357028</span>  <span class="m">10408</span> <span class="m">349748</span>    <span class="m">0</span>    <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span> <span class="m">37666</span> <span class="m">880945</span> <span class="m">25</span> <span class="m">68</span>  <span class="m">8</span>  <span class="m">0</span>  <span class="m">0</span>
+ <span class="m">7</span>  <span class="m">0</span>      <span class="m">0</span> <span class="m">1357028</span>  <span class="m">10408</span> <span class="m">349748</span>    <span class="m">0</span>    <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span> <span class="m">37639</span> <span class="m">916386</span> <span class="m">25</span> <span class="m">68</span>  <span class="m">8</span>  <span class="m">0</span>  <span class="m">0</span>
+ <span class="m">5</span>  <span class="m">0</span>      <span class="m">0</span> <span class="m">1357028</span>  <span class="m">10408</span> <span class="m">349748</span>    <span class="m">0</span>    <span class="m">0</span>     <span class="m">0</span>     <span class="m">0</span> <span class="m">37563</span> <span class="m">866896</span> <span class="m">26</span> <span class="m">67</span>  <span class="m">7</span>  <span class="m">0</span>  <span class="m">0</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>观察指标（本地实验结果）</strong>
+r：就绪队列长度达到12（远超本地cpu个数4个），增加cpu竞争
+us(user)和sy(system)：系统cpu使用率为67%，说明cpu主要被内核占用了
+in：中断次数上升到3.7万
+<strong>分析得知：系统的就绪队列过长，也就是正在运行和等待 CPU 的进 程数过多，导致了大量的上下文切换，而上下文切换又导致了系统 CPU 的占用率升高。</strong></p>
+<p>步骤3. 在第三个中断使用pidstat分析，CPU和进程上下文切换的情况</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 每隔 1 秒输出 1 组数据</span>
+<span class="c1"># -w 参数表示输出进程切换指标，而 -u 参数则表示输出 CPU 使用指标</span>
+$ pidstat -w -u <span class="m">1</span>
+<span class="c1"># 打印</span>
+Linux 4.19.76-linuxkit <span class="o">(</span>4f913ef1ae8f<span class="o">)</span> 	05/27/20 	_x86_64_	<span class="o">(</span><span class="m">4</span> CPU<span class="o">)</span>
+
+17:10:52      UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
+17:10:53        <span class="m">0</span>        <span class="m">82</span>   87.13  271.29    0.00    0.00  358.42     <span class="m">1</span>  sysbench
+
+17:10:52      UID       PID   cswch/s nvcswch/s  Command
+17:10:53        <span class="m">0</span>        <span class="m">93</span>      0.99      1.98  vmstat
+17:10:53        <span class="m">0</span>        <span class="m">95</span>      0.99     28.71  pidstat
+</code></pre></td></tr></table>
+</div>
+</div><p>分析：可以看出sysbench对cpu使用率高达358.42%,上下文切换频率低（这是因为sysbench主线程的上下文切换并不高，但它的子线程的切换却很高）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># -wt 参数表示输出线程的上下文切换指标</span>
+$ pidstat -wt <span class="m">1</span>
+<span class="c1"># 打印</span>
+Linux 4.19.76-linuxkit <span class="o">(</span>4f913ef1ae8f<span class="o">)</span> 	05/28/20 	_x86_64_	<span class="o">(</span><span class="m">4</span> CPU<span class="o">)</span>
+
+03:28:01      UID      TGID       TID   cswch/s nvcswch/s  Command
+03:28:02        <span class="m">0</span>         -        <span class="m">97</span>  10069.23  67911.54  <span class="p">|</span>__sysbench
+03:28:02        <span class="m">0</span>         -        <span class="m">98</span>   6050.00  78664.42  <span class="p">|</span>__sysbench
+03:28:02        <span class="m">0</span>         -        <span class="m">99</span>   6675.96  79503.85  <span class="p">|</span>__sysbench
+03:28:02        <span class="m">0</span>         -       <span class="m">100</span>   7087.50  59591.35  <span class="p">|</span>__sysbench
+03:28:02        <span class="m">0</span>         -       <span class="m">101</span>   7745.19  82932.69  <span class="p">|</span>__sysbench
+03:28:02        <span class="m">0</span>         -       <span class="m">102</span>   6235.58  79698.08  <span class="p">|</span>__sysbench
+03:28:02        <span class="m">0</span>         -       <span class="m">103</span>   7875.96  86739.42  <span class="p">|</span>__sysbench
+03:28:02        <span class="m">0</span>         -       <span class="m">104</span>   6096.15  88155.77  <span class="p">|</span>__sysbench
+03:28:02        <span class="m">0</span>         -       <span class="m">105</span>   6515.38  74141.35  <span class="p">|</span>__sysbench
+03:28:02        <span class="m">0</span>         -       <span class="m">106</span>   6939.42  93804.81  <span class="p">|</span>__sysbench
+03:28:02        <span class="m">0</span>       <span class="m">107</span>         -      0.96      1.92  vmstat
+03:28:02        <span class="m">0</span>         -       <span class="m">107</span>      0.96      1.92  <span class="p">|</span>__vmstat
+03:28:02        <span class="m">0</span>       <span class="m">108</span>         -      0.96    173.08  pidstat
+03:28:02        <span class="m">0</span>         -       <span class="m">108</span>      0.96    173.08  <span class="p">|</span>__pidstat
+</code></pre></td></tr></table>
+</div>
+</div><p>分析：可以看出子线程的cswch和nvcswch很高</p>
+<p>步骤4.查看中断次数</p>
+<blockquote>
+<p>中断只发生在内核态中，pidstat只是进程的分析工具，所以要从/proc/interrupts文件中读取</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># -d 参数表示高亮显示变化的区域</span>
+$ watch -d cat /proc/interrupts
+
+<span class="c1"># 打印</span>
+<span class="c1"># 数值分别对应的是cpu0 cpu1 cpu2 cpu3</span>
+...
+RES:    <span class="m">3404165</span>    <span class="m">3087853</span>    <span class="m">3195615</span>    <span class="m">3123227</span>   Rescheduling interrupts
+...
+</code></pre></td></tr></table>
+</div>
+</div><p>观察一段时间RES（重调度中断）一直在快速上升</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">zhuyhan</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-05-28
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/linux/">Linux</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/linux_05/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">基础篇|05.某个应用的CPU使用率居然达到100%，我该怎么办?</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/linux_03/">
+            <span class="next-text nav-default">基础篇|03.经常说的 CPU 上下文切换是什么意思?(上)</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+  <div id="vcomments"></div>
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+  <script type="text/javascript">
+    new Valine({
+        el: '#vcomments' ,
+        appId: 's8UQ8qUnOnRymf9kHAU0g2bK-gzGzoHsz',
+        appKey: 'bnjf212fgMPtFgiOzTcUeSpp',
+        notify:  false ,
+        verify:  false ,
+        avatar:'mm',
+        placeholder: '说点什么吧...',
+        visitor:  false 
+    });
+  </script>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:527747622@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/zhuyhan" class="iconfont icon-github" title="github"></a>
+  <a href="http://zhuyhan.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">olOwOlo</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

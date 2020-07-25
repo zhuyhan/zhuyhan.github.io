@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>34.关于 Linux 网络，你必须知道这些(下) - zhuyhan的个人博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="zhuyhan" /><meta name="description" content="1.Linux的性能指标 带宽：表示链路的最大传输速率，单位 b/s 吞吐量：表示单位时间内成功传输的数量，单位 b/s；吞吐量受带宽限制，而吞吐量/带" /><meta name="keywords" content="blog, zhuyhan, 博客" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.69.0 with theme even" />
+
+
+<link rel="canonical" href="http://zhuyhan.github.io/post/linux_34/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="34.关于 Linux 网络，你必须知道这些(下)" />
+<meta property="og:description" content="1.Linux的性能指标 带宽：表示链路的最大传输速率，单位 b/s 吞吐量：表示单位时间内成功传输的数量，单位 b/s；吞吐量受带宽限制，而吞吐量/带" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://zhuyhan.github.io/post/linux_34/" />
+<meta property="article:published_time" content="2020-06-27T09:57:19+08:00" />
+<meta property="article:modified_time" content="2020-06-27T09:57:19+08:00" />
+<meta itemprop="name" content="34.关于 Linux 网络，你必须知道这些(下)">
+<meta itemprop="description" content="1.Linux的性能指标 带宽：表示链路的最大传输速率，单位 b/s 吞吐量：表示单位时间内成功传输的数量，单位 b/s；吞吐量受带宽限制，而吞吐量/带">
+<meta itemprop="datePublished" content="2020-06-27T09:57:19&#43;08:00" />
+<meta itemprop="dateModified" content="2020-06-27T09:57:19&#43;08:00" />
+<meta itemprop="wordCount" content="903">
+
+
+
+<meta itemprop="keywords" content="Linux," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="34.关于 Linux 网络，你必须知道这些(下)"/>
+<meta name="twitter:description" content="1.Linux的性能指标 带宽：表示链路的最大传输速率，单位 b/s 吞吐量：表示单位时间内成功传输的数量，单位 b/s；吞吐量受带宽限制，而吞吐量/带"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">zhuyhan</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">zhuyhan</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">34.关于 Linux 网络，你必须知道这些(下)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-06-27 </span>
+        <div class="post-category">
+            <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1linux的性能指标">1.Linux的性能指标</a></li>
+    <li><a href="#2网络配置">2.网络配置</a></li>
+    <li><a href="#3套接字信息">3.套接字信息</a></li>
+    <li><a href="#4网络吞吐和pps">4.网络吞吐和PPS</a></li>
+    <li><a href="#5连通性和延时">5.连通性和延时</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="1linux的性能指标">1.Linux的性能指标</h2>
+<ul>
+<li>带宽：表示链路的最大传输速率，单位 b/s</li>
+<li>吞吐量：表示单位时间内成功传输的数量，单位 b/s；吞吐量受带宽限制，而吞吐量/带宽，也就是网络的使用率</li>
+<li>延时：表示从网络请求发出后，一直到收到远端响应，所需要的时间延迟。</li>
+<li>PPS：是Packet Per Second(包/秒)的缩写，表示以网络包为单位的传输速率</li>
+</ul>
+<h2 id="2网络配置">2.网络配置</h2>
+<blockquote>
+<p>查看网络接口的配置和状态</p>
+</blockquote>
+<ol>
+<li>ifconfig</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ ifconfig eth0
+<span class="c1"># 打印</span>
+eth0: <span class="nv">flags</span><span class="o">=</span>4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu <span class="m">1500</span>
+        inet 172.17.0.2  netmask 255.255.0.0  broadcast 172.17.255.255
+        ether 02:42:ac:11:00:02  txqueuelen <span class="m">0</span>  <span class="o">(</span>Ethernet<span class="o">)</span>
+        RX packets <span class="m">9757</span>  bytes <span class="m">13002308</span> <span class="o">(</span>13.0 MB<span class="o">)</span>
+        RX errors <span class="m">0</span>  dropped <span class="m">0</span>  overruns <span class="m">0</span>  frame <span class="m">0</span>
+        TX packets <span class="m">5442</span>  bytes <span class="m">299138</span> <span class="o">(</span>299.1 KB<span class="o">)</span>
+        TX errors <span class="m">0</span>  dropped <span class="m">0</span> overruns <span class="m">0</span>  carrier <span class="m">0</span>  collisions <span class="m">0</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>2.ip</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ ip -s addr show dev eth0
+<span class="c1"># 打印</span>
+7: eth0@if8: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu <span class="m">1500</span> qdisc noqueue state UP group default
+    link/ether 02:42:ac:11:00:02 brd ff:ff:ff:ff:ff:ff link-netnsid <span class="m">0</span>
+    inet 172.17.0.2/16 brd 172.17.255.255 scope global eth0
+       valid_lft forever preferred_lft forever
+    RX: bytes  packets  errors  dropped overrun mcast
+    <span class="m">13003218</span>   <span class="m">9770</span>     <span class="m">0</span>       <span class="m">0</span>       <span class="m">0</span>       <span class="m">0</span>
+    TX: bytes  packets  errors  dropped carrier collsns
+    <span class="m">299138</span>     <span class="m">5442</span>     <span class="m">0</span>       <span class="m">0</span>       <span class="m">0</span>       <span class="m">0</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>网络状态：ifconfig的（RUNNING）、ip的（LOWER_UP）表示物理网络是连通的</li>
+<li>MTU默认是1500</li>
+<li>网络接口的IP地址、子网掩码</li>
+<li>网络收发的字节数、包数、错误数以及丢包情况，特别是 TX 和 RX 部分的 errors、dropped、overruns、carrier 以及 collisions 等指标不为 0 时，通常表示出现 了网络 I/O 问题。</li>
+</ul>
+<h2 id="3套接字信息">3.套接字信息</h2>
+<blockquote>
+<p>网络协议栈中的统计信息</p>
+</blockquote>
+<p>1.netstat</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ netstat -nlp <span class="p">|</span> head -n <span class="m">3</span>
+<span class="c1"># 打印</span>
+Active Internet connections <span class="o">(</span>only servers<span class="o">)</span>
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+</code></pre></td></tr></table>
+</div>
+</div><p>2.ss</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ ss -ltnp <span class="p">|</span> head -n <span class="m">3</span>
+<span class="c1"># 打印</span>
+State   Recv-Q   Send-Q     Local Address:Port     Peer Address:Port  Process
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>当套接字处于连接状态(Established)时
+<ul>
+<li>Recv-Q 表示套接字缓冲还没有被应用程序取走的字节数(即接收队列长度)</li>
+<li>Send-Q 表示还没有被远端主机确认的字节数(即发送队列长度)</li>
+</ul>
+</li>
+<li>套接字处于监听状态(Listening)时
+<ul>
+<li>Recv-Q 表示 syn backlog 的当前值</li>
+<li>Send-Q 表示最大的 syn backlog 值</li>
+</ul>
+</li>
+</ul>
+<p>协议栈统计信息</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ netstat -s
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ ss -s
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="4网络吞吐和pps">4.网络吞吐和PPS</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 数字 1 表示每隔 1 秒输出一组数据</span> 
+$ sar -n DEV <span class="m">1</span>
+
+<span class="c1"># 打印</span>
+13:21:40 IFACE rxpck/s txpck/s rxkB/s txkB/s rxcmp/s txcmp/s rxmcs
+13:21:41  eth0 18.00   20.00   5.79   4.25    0.00   0.00   <span class="m">0</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>rxpck/s 和 txpck/s 分别是接收和发送的 PPS，单位为包 / 秒。</li>
+<li>rxkB/s 和 txkB/s 分别是接收和发送的吞吐量，单位是 KB/ 秒。</li>
+<li>rxcmp/s 和 txcmp/s 分别是接收和发送的压缩数据包数，单位是包 / 秒。</li>
+<li>%ifutil 是网络接口的使用率，即半双工模式下为 (rxkB/s+txkB/s)/Bandwidth，而全双工模式下为 max(rxkB/s, txkB/s)/Bandwidth。</li>
+</ul>
+<h2 id="5连通性和延时">5.连通性和延时</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># -c3 表示发送三次 ICMP 包后停止</span>
+$ ping -c3 114.114.114.114
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">zhuyhan</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-06-27
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/linux/">Linux</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/linux_35/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">35.基础篇|C10K 和 C1000K 回顾</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/linux_33/">
+            <span class="next-text nav-default">33.关于 Linux 网络，你必须知道这些(上)</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+  <div id="vcomments"></div>
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+  <script type="text/javascript">
+    new Valine({
+        el: '#vcomments' ,
+        appId: 's8UQ8qUnOnRymf9kHAU0g2bK-gzGzoHsz',
+        appKey: 'bnjf212fgMPtFgiOzTcUeSpp',
+        notify:  false ,
+        verify:  false ,
+        avatar:'mm',
+        placeholder: '说点什么吧...',
+        visitor:  false 
+    });
+  </script>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:527747622@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/zhuyhan" class="iconfont icon-github" title="github"></a>
+  <a href="http://zhuyhan.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">olOwOlo</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

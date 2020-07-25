@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>zhuyhan的个人博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="olOwOlo" /><meta name="description" content="zhuyhan的个人博客" /><meta name="keywords" content="blog, zhuyhan, 博客" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.69.0 with theme even" />
+
+
+<link rel="canonical" href="http://zhuyhan.github.io/" />
+  <link href="http://zhuyhan.github.io/index.xml" rel="alternate" type="application/rss+xml" title="zhuyhan的个人博客" />
+  <link href="http://zhuyhan.github.io/index.xml" rel="feed" type="application/rss+xml" title="zhuyhan的个人博客" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="zhuyhan的个人博客" />
+<meta property="og:description" content="zhuyhan的个人博客" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="http://zhuyhan.github.io/" />
+<meta property="og:updated_time" content="2017-08-20T21:38:52+08:00" />
+<meta itemprop="name" content="zhuyhan的个人博客">
+<meta itemprop="description" content="zhuyhan的个人博客"><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="zhuyhan的个人博客"/>
+<meta name="twitter:description" content="zhuyhan的个人博客"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">zhuyhan</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">zhuyhan</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <section id="posts" class="posts">
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/linux_17/">案例篇|17.如何利用系统缓存优化程序的运行效率?</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-06-04 </span>
+      <div class="post-category">
+          <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      1.缓存命中率 缓存命中率是直接通过缓存获取数据的请求次数，占所有数据请求次数的百分比。 命中率越高，表示使用缓存带来的收益越高，应用程序的性能
+    </div>
+    <div class="read-more">
+      <a href="/post/linux_17/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/linux_16/">基础篇|16.怎么理解内存中的Buffer和Cache?</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-06-04 </span>
+      <div class="post-category">
+          <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      1.buffer和cache Buffers是对原始磁盘块的临时存储，也就是缓存磁盘的数据(20MB左右) Cached 是从磁盘读取文件的页缓存，也就是用
+    </div>
+    <div class="read-more">
+      <a href="/post/linux_16/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/linux_15/">基础篇|15.Linux内存是怎么工作的?</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-06-04 </span>
+      <div class="post-category">
+          <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      1. 内存映射 内存映射：就是将虚拟内存地址映射到物理内存地址 多级页表：将内存分成区块来管理，将原来的映射关系改成区块索引和区块内的便宜 大页：比普
+    </div>
+    <div class="read-more">
+      <a href="/post/linux_15/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/linux_14/">第二周——CPU性能篇总结</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-06-04 </span>
+      <div class="post-category">
+          <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      看了一遍第一阶段的cpu性能篇，对cpu性能分析有一个大概的了解；由于遗忘的缘故，花了点时间重新阅读一遍，顺便写下第一阶段的总结。以前对li
+    </div>
+    <div class="read-more">
+      <a href="/post/linux_14/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/book_01/">《娱乐至死》——尼尔·波兹曼</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-06-03 </span>
+      <div class="post-category">
+          <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"> 读书笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      我们将毁于 我们所热爱的东西！ “娱乐至死”这四个字，从高中时代就深刻印在我脑海里，那时对它的理解是人们沉浸于安逸、狂欢中导致危难。其实不是，作
+    </div>
+    <div class="read-more">
+      <a href="/post/book_01/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/linux_13/">答疑|Linux 性能优化答疑(13、14篇)</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-05-31 </span>
+      <div class="post-category">
+          <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      重点概念 重调度中断是调度器用来分散任务到不同 CPU 的机制，也就是可以唤醒空闲状态的 CPU ，来调度新任务运行，而这通常借助处理器间中断(Inter-P
+    </div>
+    <div class="read-more">
+      <a href="/post/linux_13/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/linux_12/">套路篇|12.CPU 性能优化的几个思路</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-05-31 </span>
+      <div class="post-category">
+          <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      性能优化方法论 动手优化之前思考三个问题： 首先，既然要做性能优化，那要怎么判断它是不是有效呢?特别是优化后，到底能提升 多少性能呢? 第二，性能问
+    </div>
+    <div class="read-more">
+      <a href="/post/linux_12/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/linux_11/">套路篇|11.如何迅速分析出系统CPU的瓶颈在哪里?</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-05-31 </span>
+      <div class="post-category">
+          <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      【11套路篇】这篇文章比价干货满满，要时常复习 CPU性能指标 CPU 使用率 用户CPU使用率 系统CPU使用率 等待I/O的CPU使用率 软中断和硬中断的
+    </div>
+    <div class="read-more">
+      <a href="/post/linux_11/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/linux_10/">案例篇|10.系统的软中断CPU使用率升高，我该怎么办?</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-05-31 </span>
+      <div class="post-category">
+          <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      案例 工具 sar是一个系统活动报告工作，既可以实时查看系统的当前活动，又可以配置保存和报告历史统计数据 hping3 是一个可以构造 TCP/IP 协议数据包的工具，可以
+    </div>
+    <div class="read-more">
+      <a href="/post/linux_10/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/linux_09/">基础篇|09.怎么理解Linux软中断?</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-05-31 </span>
+      <div class="post-category">
+          <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      1. 概念 1.1 中断 中断是系统用来响应硬件设备请求的一种机制，它会打断进程的正常调度和执行，然后调用内核中的中断处理程序来响应设备的请求 中断其实是一
+    </div>
+    <div class="read-more">
+      <a href="/post/linux_09/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/linux_08/">案例篇|08.系统中出现大量不可中断进程和僵尸进程怎么办? (下)</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-05-29 </span>
+      <div class="post-category">
+          <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      iowait 分析 对于iowait升高的问题，首先要查询系统i/o情况，使用dstat工具可以同时查看cpu和i/o这两种资源的使用情况 步骤1.dsta
+    </div>
+    <div class="read-more">
+      <a href="/post/linux_08/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/linux_07/">案例篇|07.系统中出现大量不可中断进程和僵尸进程怎么办? (上)</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-05-29 </span>
+      <div class="post-category">
+          <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      当iowait升高时，进程很可能因为得不到硬件的响应，而长时间处于不可中断状态.从ps或者top命令的输出中，可以发现它们都处于D状态，也就
+    </div>
+    <div class="read-more">
+      <a href="/post/linux_07/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/linux_06/">案例篇|06.系统的CPU使用率很高，但为啥却找不到高CPU的应用?</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-05-29 </span>
+      <div class="post-category">
+          <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      1.案例场景 系统的用户 CPU 使用率（usr%）过高 没有 CPU 使用率高的进程 2.案例环境 本地系统：mac docker：docker镜像-cpu使用率过
+    </div>
+    <div class="read-more">
+      <a href="/post/linux_06/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/linux_05/">基础篇|05.某个应用的CPU使用率居然达到100%，我该怎么办?</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-05-29 </span>
+      <div class="post-category">
+          <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      Linux 作为一个多任务操作系统，将每个 CPU 的时间划分为很短的时间片，再通过调度器轮流分配给各个任务使用，因此造成多任务同时运行的错觉。 1.CPU使用
+    </div>
+    <div class="read-more">
+      <a href="/post/linux_05/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/linux_04/">基础篇|04.经常说的 CPU 上下文切换是什么意思?(下)</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-05-28 </span>
+      <div class="post-category">
+          <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      研究怎么分析CPU上下文切换的问题 1.怎么查看系统上下文切换情况 vmstat是一个常用的系统性能分析工具，主要用来分析系统内存使用情况，也用
+    </div>
+    <div class="read-more">
+      <a href="/post/linux_04/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/linux_03/">基础篇|03.经常说的 CPU 上下文切换是什么意思?(上)</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-05-28 </span>
+      <div class="post-category">
+          <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      1.什么是CPU上下文切换 就是先把前一个任务的CPU上下文（也就是CPU寄存器和程序计数器）保存起来，然后加载新任务的上下文到这些寄存器和程
+    </div>
+    <div class="read-more">
+      <a href="/post/linux_03/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/linux_01/">基础篇|02.平均负载</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-05-28 </span>
+      <div class="post-category">
+          <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      什么是平均负载？ 平均负载指得是单位时间内，系统处于可运行状态和不可中断状态的平均进程数，也就是平均活跃进程数，它和CPU使用率没有直接关系 可
+    </div>
+    <div class="read-more">
+      <a href="/post/linux_01/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/mysql_join/">JOIN语句实现和优化</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-04-25 </span>
+      <div class="post-category">
+          <a href="/categories/mysql/"> Mysql </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      join语句会用到两个算法Index Nested-Loop和Block Nested—Loop;这里会介绍何时会用到这两种算法和优化方法 1.本
+    </div>
+    <div class="read-more">
+      <a href="/post/mysql_join/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/golang_model1/">golang的并发模型</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-04-25 </span>
+      <div class="post-category">
+          <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"> 设计模式 </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      介绍两种golang常见的并发模型 1.生产者/消费者模型 生产者/消费者模型，包含两类线程。一种是生产者线程用于生产数据（成果队列），另外一种
+    </div>
+    <div class="read-more">
+      <a href="/post/golang_model1/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/mysql_count/">Mysql是怎样实现统计一张表行数</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2020-04-15 </span>
+      <div class="post-category">
+          <a href="/categories/mysql/"> Mysql </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      开发时时如何统计一张表的总函数，一般是select count(*) form t,但是随着表数据大，会越查越慢 一、不同实现COUNT的方式 MyISAM引擎 查询整表总
+    </div>
+    <div class="read-more">
+      <a href="/post/mysql_count/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
+    </section>
+  
+  <nav class="pagination">
+    <a class="prev" href="/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text">Prev</span>
+      </a>
+    <a class="next" href="/page/3/">
+        <span class="next-text">Next</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+  </nav>
+        </div>
+        
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:527747622@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/zhuyhan" class="iconfont icon-github" title="github"></a>
+  <a href="http://zhuyhan.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">olOwOlo</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

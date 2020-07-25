@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>redis on zhuyhan的个人博客</title>
+    <link>http://zhuyhan.github.io/categories/redis/</link>
+    <description>Recent content in redis on zhuyhan的个人博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Wed, 10 Jun 2020 09:46:32 +0800</lastBuildDate>
+    
+	<atom:link href="http://zhuyhan.github.io/categories/redis/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>《Redis设计与实现》笔记</title>
+      <link>http://zhuyhan.github.io/post/the_design_implementation_of_redis/</link>
+      <pubDate>Wed, 10 Jun 2020 09:46:32 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/the_design_implementation_of_redis/</guid>
+      <description>第一章 引言 本书基于Redis 2.9 和 3.0来编写的 第一部分 “数据结构与对象” 第二部分 &amp;ldquo;单机数据库的实现&amp;rdquo; 第三部分 &amp;ldq</description>
+    </item>
+    
+  </channel>
+</rss>

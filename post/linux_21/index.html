@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>套路篇|21.如何“快准狠”找到系统内存的问题? - zhuyhan的个人博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="zhuyhan" /><meta name="description" content="1. 内存性能指标 1.1 系统内存使用情况 已用内存：已经使用的内存 剩余内存：还未使用的内存 共享内存：通过tmpfs实现，高效率，df -h命令查看 可用内" /><meta name="keywords" content="blog, zhuyhan, 博客" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.69.0 with theme even" />
+
+
+<link rel="canonical" href="http://zhuyhan.github.io/post/linux_21/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="套路篇|21.如何“快准狠”找到系统内存的问题?" />
+<meta property="og:description" content="1. 内存性能指标 1.1 系统内存使用情况 已用内存：已经使用的内存 剩余内存：还未使用的内存 共享内存：通过tmpfs实现，高效率，df -h命令查看 可用内" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://zhuyhan.github.io/post/linux_21/" />
+<meta property="article:published_time" content="2020-06-04T17:49:18+08:00" />
+<meta property="article:modified_time" content="2020-06-04T17:49:18+08:00" />
+<meta itemprop="name" content="套路篇|21.如何“快准狠”找到系统内存的问题?">
+<meta itemprop="description" content="1. 内存性能指标 1.1 系统内存使用情况 已用内存：已经使用的内存 剩余内存：还未使用的内存 共享内存：通过tmpfs实现，高效率，df -h命令查看 可用内">
+<meta itemprop="datePublished" content="2020-06-04T17:49:18&#43;08:00" />
+<meta itemprop="dateModified" content="2020-06-04T17:49:18&#43;08:00" />
+<meta itemprop="wordCount" content="699">
+
+
+
+<meta itemprop="keywords" content="Linux," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="套路篇|21.如何“快准狠”找到系统内存的问题?"/>
+<meta name="twitter:description" content="1. 内存性能指标 1.1 系统内存使用情况 已用内存：已经使用的内存 剩余内存：还未使用的内存 共享内存：通过tmpfs实现，高效率，df -h命令查看 可用内"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">zhuyhan</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">zhuyhan</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">套路篇|21.如何“快准狠”找到系统内存的问题?</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-06-04 </span>
+        <div class="post-category">
+            <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-内存性能指标">1. 内存性能指标</a>
+      <ul>
+        <li><a href="#11-系统内存使用情况">1.1 系统内存使用情况</a></li>
+        <li><a href="#12-进程内存使用情况">1.2 进程内存使用情况</a></li>
+        <li><a href="#13-swap-的使用情况">1.3 Swap 的使用情况</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-性能工具">2. 性能工具</a></li>
+    <li><a href="#3快速分析内存的性能瓶颈">3.快速分析内存的性能瓶颈</a></li>
+    <li><a href="#4优化">4.优化</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="1-内存性能指标">1. 内存性能指标</h2>
+<h3 id="11-系统内存使用情况">1.1 系统内存使用情况</h3>
+<ul>
+<li>已用内存：已经使用的内存</li>
+<li>剩余内存：还未使用的内存</li>
+<li>共享内存：通过tmpfs实现，高效率，<code>df -h</code>命令查看</li>
+<li>可用内存：新进程可以使用的最大内存，它包括剩余内存和可回收缓存</li>
+<li>缓存：一部分是磁盘读取文件的页缓存，另一部分是 Slab 分配器中的可回收内存</li>
+<li>缓存区：对原始磁盘块的临时存储，用来缓存将要写入磁盘的数据。</li>
+</ul>
+<h3 id="12-进程内存使用情况">1.2 进程内存使用情况</h3>
+<ul>
+<li>虚拟内存(vss)：包括了进程代码段、数据段、共享内存、已经申请的堆内存和已经换出的内 存等。</li>
+<li>常驻内存(rss)：是进程实际使用的物理内存</li>
+<li>共享内存(uss)：包括与其他进程共同使用的真实共享内存，还包括加载的动态链接库以及程序的代码段</li>
+<li>Swap内存：通过 Swap 换出到磁盘的内存</li>
+<li>内存缺页</li>
+</ul>
+<h3 id="13-swap-的使用情况">1.3 Swap 的使用情况</h3>
+<ul>
+<li>已用空间</li>
+<li>剩余空间</li>
+<li>换入速度：每秒内存换入的速度</li>
+<li>换出速度：每秒内存换出的速度</li>
+</ul>
+<h2 id="2-性能工具">2. 性能工具</h2>
+<p><img src="evernotecid://A8596967-EFAA-4FDE-88EB-1CD2AAAAB0F2/appyinxiangcom/16057268/ENResource/p1667" alt="b751a6f1cb6050b190fedc6e14b8d960.png"></p>
+<h2 id="3快速分析内存的性能瓶颈">3.快速分析内存的性能瓶颈</h2>
+<ol>
+<li>先用 free 和 top，查看系统整体的内存使用情况。</li>
+<li>再用 vmstat 和 pidstat，查看一段时间的趋势，从而判断出内存问题的类型。</li>
+<li>最后进行详细分析，比如内存分配分析、缓存 / 缓冲区分析、具体进程的内存使用分析
+等。</li>
+</ol>
+<h2 id="4优化">4.优化</h2>
+<ol>
+<li>最好禁止 Swap。如果必须开启 Swap，降低 swappiness 的值，减少内存回收时 Swap 的使用倾向。</li>
+<li>减少内存的动态分配。比如，可以使用内存池、大页(HugePage)等。</li>
+<li>尽量使用缓存和缓冲区来访问数据。比如，可以使用堆栈明确声明内存空间，来存储需
+要缓存的数据;或者用 Redis 这类的外部缓存组件，优化数据的访问。</li>
+<li>使用 cgroups 等方式限制进程的内存使用情况。这样，可以确保系统内存不会被异常
+进程耗尽。</li>
+<li>通过 /proc/pid/oom_adj ，调整核心应用的 oom_score。这样，可以保证即使内存紧
+张，核心应用也不会被 OOM 杀死。</li>
+</ol>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">zhuyhan</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-06-04
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/linux/">Linux</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/linux_week1/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">第一周——CPU性能篇总结(02~07)</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/linux_19/">
+            <span class="next-text nav-default">案例篇|19.为什么系统的Swap变高了(上)</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+  <div id="vcomments"></div>
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+  <script type="text/javascript">
+    new Valine({
+        el: '#vcomments' ,
+        appId: 's8UQ8qUnOnRymf9kHAU0g2bK-gzGzoHsz',
+        appKey: 'bnjf212fgMPtFgiOzTcUeSpp',
+        notify:  false ,
+        verify:  false ,
+        avatar:'mm',
+        placeholder: '说点什么吧...',
+        visitor:  false 
+    });
+  </script>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:527747622@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/zhuyhan" class="iconfont icon-github" title="github"></a>
+  <a href="http://zhuyhan.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">olOwOlo</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

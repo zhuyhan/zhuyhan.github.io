@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>基础篇|24.Linux 磁盘I/O是怎么工作的(上) - zhuyhan的个人博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="zhuyhan" /><meta name="description" content="1. 磁盘 磁盘是可以持久化存储的设备 根据存储介质的不同，常见磁盘可以分为两类:机械磁盘和固态磁盘。 机械磁盘，硬盘驱动器(Hard Disk Driver)" /><meta name="keywords" content="blog, zhuyhan, 博客" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.69.0 with theme even" />
+
+
+<link rel="canonical" href="http://zhuyhan.github.io/post/linux_24/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="基础篇|24.Linux 磁盘I/O是怎么工作的(上)" />
+<meta property="og:description" content="1. 磁盘 磁盘是可以持久化存储的设备 根据存储介质的不同，常见磁盘可以分为两类:机械磁盘和固态磁盘。 机械磁盘，硬盘驱动器(Hard Disk Driver)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://zhuyhan.github.io/post/linux_24/" />
+<meta property="article:published_time" content="2020-06-21T23:13:34+08:00" />
+<meta property="article:modified_time" content="2020-06-21T23:13:34+08:00" />
+<meta itemprop="name" content="基础篇|24.Linux 磁盘I/O是怎么工作的(上)">
+<meta itemprop="description" content="1. 磁盘 磁盘是可以持久化存储的设备 根据存储介质的不同，常见磁盘可以分为两类:机械磁盘和固态磁盘。 机械磁盘，硬盘驱动器(Hard Disk Driver)">
+<meta itemprop="datePublished" content="2020-06-21T23:13:34&#43;08:00" />
+<meta itemprop="dateModified" content="2020-06-21T23:13:34&#43;08:00" />
+<meta itemprop="wordCount" content="828">
+
+
+
+<meta itemprop="keywords" content="Linux," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="基础篇|24.Linux 磁盘I/O是怎么工作的(上)"/>
+<meta name="twitter:description" content="1. 磁盘 磁盘是可以持久化存储的设备 根据存储介质的不同，常见磁盘可以分为两类:机械磁盘和固态磁盘。 机械磁盘，硬盘驱动器(Hard Disk Driver)"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">zhuyhan</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">zhuyhan</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">基础篇|24.Linux 磁盘I/O是怎么工作的(上)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-06-21 </span>
+        <div class="post-category">
+            <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-磁盘">1. 磁盘</a></li>
+    <li><a href="#2-通用块层">2. 通用块层</a></li>
+    <li><a href="#3-io栈">3. I/O栈</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="1-磁盘">1. 磁盘</h2>
+<blockquote>
+<p>磁盘是可以持久化存储的设备</p>
+</blockquote>
+<ul>
+<li>根据存储介质的不同，常见磁盘可以分为两类:机械磁盘和固态磁盘。
+<ul>
+<li><strong>机械磁盘</strong>，硬盘驱动器(Hard Disk Driver)。机械磁 盘主要由盘片和读写磁头组成，数据就存储在盘片的环状磁道中。最小读写单位是扇区，一般大小为 512 字节。</li>
+<li><strong>固态磁盘</strong>(Solid State Disk)，由固态电子元器件组成。固态磁盘不需要磁道寻址，所以，不管是连续 I/O，还是随机 I/O 的性能，都比机械磁盘要好得多。最小读写单位是页，通常大小是4KB、8KB 等。</li>
+</ul>
+</li>
+<li>按照接口来分类：
+<ul>
+<li>IDE(Integrated Drive Electronics)</li>
+<li>SCSI(Small Computer System Interface)</li>
+<li>SAS(Serial Attached SCSI)</li>
+<li>SATA(Serial ATA)</li>
+<li>FC(Fibre Channel)</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-通用块层">2. 通用块层</h2>
+<blockquote>
+<p>通用块层，其实是处在文件系统和磁盘驱动中间的一个块设备抽象层。</p>
+</blockquote>
+<p>第一个功能，跟虚拟文件系统的功能类似。向上，为文件系统和应用程序，提供访问块设备的标准接口;向下，把各种异构的磁盘设备抽象为统一的块设备，并提供统一框架来 管理这些设备的驱动程序。
+第二个功能，通用块层还会给文件系统和应用程序发来的 I/O 请求排队，并通过重新排 序、请求合并等方式，提高磁盘读写的效率。</p>
+<p>Linux内核支持四种I/O调度算法：</p>
+<ol>
+<li>NONE：并不能算 I/O 调度算法。</li>
+<li>NOOP：是最简单的一种。它是一个先入先出的队列，只做一些最基本的请求合并，常用于SSD磁盘。</li>
+<li>CFQ：被称为完全公平调度器。维护一个I/O调度队列，并按照时间片均匀分布每个进程的I/O请求</li>
+<li>DeadLine：分别为读、写请求创建了不同的 I/O 队列，可以提高机械 磁盘的吞吐量，并确保达到最终期限(deadline)的请求被优先处理。</li>
+</ol>
+<h2 id="3-io栈">3. I/O栈</h2>
+<blockquote>
+<p>把 Linux 存储系统的 I/O 栈，由上到下分为三个层次，分别是文件系统层、通用块层和设备层。</p>
+</blockquote>
+<ul>
+<li>文件系统层，包括虚拟文件系统和其他各种文件系统的具体实现。它为上层的应用程序，提供标准的文件访问接口;对下会通过通用块层，来存储和管理磁盘数据。</li>
+<li>通用块层，包括块设备 I/O 队列和 I/O 调度器。它会对文件系统的 I/O 请求进行排队，再通过重新排序和请求合并，然后才要发送给下一级的设备层。</li>
+<li>设备层，包括存储设备和相应的驱动程序，负责最终物理设备的 I/O 操作。</li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">zhuyhan</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-06-21
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/linux/">Linux</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/linux_25/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">基础篇|25.Linux 磁盘I/O是怎么工作的(下)</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/linux_23/">
+            <span class="next-text nav-default">基础篇|23.Linux 文件系统是怎么工作的?</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+  <div id="vcomments"></div>
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+  <script type="text/javascript">
+    new Valine({
+        el: '#vcomments' ,
+        appId: 's8UQ8qUnOnRymf9kHAU0g2bK-gzGzoHsz',
+        appKey: 'bnjf212fgMPtFgiOzTcUeSpp',
+        notify:  false ,
+        verify:  false ,
+        avatar:'mm',
+        placeholder: '说点什么吧...',
+        visitor:  false 
+    });
+  </script>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:527747622@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/zhuyhan" class="iconfont icon-github" title="github"></a>
+  <a href="http://zhuyhan.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">olOwOlo</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

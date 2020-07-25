@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Golang on zhuyhan的个人博客</title>
+    <link>http://zhuyhan.github.io/tags/golang/</link>
+    <description>Recent content in Golang on zhuyhan的个人博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 25 Apr 2020 21:50:59 +0800</lastBuildDate>
+    
+	<atom:link href="http://zhuyhan.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>golang的并发模型</title>
+      <link>http://zhuyhan.github.io/post/golang_model1/</link>
+      <pubDate>Sat, 25 Apr 2020 21:50:59 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/golang_model1/</guid>
+      <description>介绍两种golang常见的并发模型 1.生产者/消费者模型 生产者/消费者模型，包含两类线程。一种是生产者线程用于生产数据（成果队列），另外一种</description>
+    </item>
+    
+    <item>
+      <title>设计模式-单列模式</title>
+      <link>http://zhuyhan.github.io/post/design-patterns-singleton/</link>
+      <pubDate>Sat, 11 Apr 2020 16:42:16 +0800</pubDate>
+      
+      <guid>http://zhuyhan.github.io/post/design-patterns-singleton/</guid>
+      <description>单例对象的类必须保证只有一个实例存在，全局有唯一接口访问。 分类 懒汉模式：指全局的单例实例在第一次呗使用时构建 饿汉模式：指全局的单例在类装载时</description>
+    </item>
+    
+  </channel>
+</rss>

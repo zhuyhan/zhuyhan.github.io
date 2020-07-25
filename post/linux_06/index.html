@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>案例篇|06.系统的CPU使用率很高，但为啥却找不到高CPU的应用? - zhuyhan的个人博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="zhuyhan" /><meta name="description" content="1.案例场景 系统的用户 CPU 使用率（usr%）过高 没有 CPU 使用率高的进程 2.案例环境 本地系统：mac docker：docker镜像-cpu使用率过" /><meta name="keywords" content="blog, zhuyhan, 博客" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.69.0 with theme even" />
+
+
+<link rel="canonical" href="http://zhuyhan.github.io/post/linux_06/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="案例篇|06.系统的CPU使用率很高，但为啥却找不到高CPU的应用?" />
+<meta property="og:description" content="1.案例场景 系统的用户 CPU 使用率（usr%）过高 没有 CPU 使用率高的进程 2.案例环境 本地系统：mac docker：docker镜像-cpu使用率过" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://zhuyhan.github.io/post/linux_06/" />
+<meta property="article:published_time" content="2020-05-29T12:51:22+08:00" />
+<meta property="article:modified_time" content="2020-05-29T12:51:22+08:00" />
+<meta itemprop="name" content="案例篇|06.系统的CPU使用率很高，但为啥却找不到高CPU的应用?">
+<meta itemprop="description" content="1.案例场景 系统的用户 CPU 使用率（usr%）过高 没有 CPU 使用率高的进程 2.案例环境 本地系统：mac docker：docker镜像-cpu使用率过">
+<meta itemprop="datePublished" content="2020-05-29T12:51:22&#43;08:00" />
+<meta itemprop="dateModified" content="2020-05-29T12:51:22&#43;08:00" />
+<meta itemprop="wordCount" content="1418">
+
+
+
+<meta itemprop="keywords" content="Linux," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="案例篇|06.系统的CPU使用率很高，但为啥却找不到高CPU的应用?"/>
+<meta name="twitter:description" content="1.案例场景 系统的用户 CPU 使用率（usr%）过高 没有 CPU 使用率高的进程 2.案例环境 本地系统：mac docker：docker镜像-cpu使用率过"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">zhuyhan</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">zhuyhan</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">案例篇|06.系统的CPU使用率很高，但为啥却找不到高CPU的应用?</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-05-29 </span>
+        <div class="post-category">
+            <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1案例场景">1.案例场景</a></li>
+    <li><a href="#2案例环境">2.案例环境</a></li>
+    <li><a href="#3操作分析">3.操作分析</a>
+      <ul>
+        <li><a href="#31-检查环境正常">3.1 检查环境正常</a></li>
+        <li><a href="#32-压力测试">3.2 压力测试</a></li>
+        <li><a href="#33-分析">3.3 分析</a></li>
+        <li><a href="#34其他工具">3.4其他工具</a></li>
+      </ul>
+    </li>
+    <li><a href="#4总结">4.总结</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="1案例场景">1.案例场景</h2>
+<ul>
+<li>系统的用户 CPU 使用率（usr%）过高</li>
+<li>没有 CPU 使用率高的进程</li>
+</ul>
+<h2 id="2案例环境">2.案例环境</h2>
+<ul>
+<li>本地系统：mac</li>
+<li>docker：<a href="https://github.com/feiskyer/linux-perf-examples/tree/master/nginx-short-process">docker镜像-cpu使用率过高</a></li>
+<li>补充：
+1.phpfpm容器要给权限 <code>docker run --privileged ...</code>;
+2.进入phpfpm安装检查软件 <code>apt install stress sysstat</code>;
+3.phpfpm内安装perf<code>apt-get install -y linux-perf</code></li>
+</ul>
+<h2 id="3操作分析">3.操作分析</h2>
+<h3 id="31-检查环境正常">3.1 检查环境正常</h3>
+<p>在第二个中断，确认Nginx服务器正常启动,并发送100个请求检查Nginx性能</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># ip地址是虚拟机的ip地址</span>
+$ curl http://127.0.0.1:10000/
+<span class="c1"># 并发 100 个请求测试 Nginx 性能，总共测试 1000 个请求</span>
+$ ab -c <span class="m">100</span> -n <span class="m">1000</span> http://127.0.0.1:10000/
+<span class="c1"># 打印</span>
+...
+Requests per second:    130.19 <span class="o">[</span><span class="c1">#/sec] (mean)</span>
+Time per request:       768.107 <span class="o">[</span>ms<span class="o">]</span> <span class="o">(</span>mean<span class="o">)</span>
+...
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="32-压力测试">3.2 压力测试</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 并发请求数为5，请求时间为10分钟（-t 600）</span>
+$ b -c <span class="m">5</span> -t <span class="m">600</span> http://192.168.0.10:10000/
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="33-分析">3.3 分析</h3>
+<p><strong>步骤1</strong>. 用top观察系统的cpu使用情况</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">...
+Tasks:  <span class="m">20</span> total,   <span class="m">6</span> running,  <span class="m">14</span> sleeping,   <span class="m">0</span> stopped,   <span class="m">0</span> zombie
+%Cpu<span class="o">(</span>s<span class="o">)</span>: 62.3 us, 24.9 sy,  0.0 ni, 11.2 id,  0.0 wa,  0.0 hi,  1.6 si,  0.0 st
+...
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+<span class="m">34256</span> daemon    <span class="m">20</span>   <span class="m">0</span>  <span class="m">227180</span>  <span class="m">14296</span>   <span class="m">8296</span> S   3.0   0.7   0:00.19 php-fpm
+<span class="m">34261</span> daemon    <span class="m">20</span>   <span class="m">0</span>  <span class="m">227180</span>  <span class="m">14232</span>   <span class="m">8232</span> R   2.7   0.7   0:00.18 php-fpm
+<span class="m">34269</span> daemon    <span class="m">20</span>   <span class="m">0</span>  <span class="m">227180</span>  <span class="m">14232</span>   <span class="m">8232</span> S   2.7   0.7   0:00.18 php-fpm
+<span class="m">34272</span> daemon    <span class="m">20</span>   <span class="m">0</span>  <span class="m">227180</span>  <span class="m">14232</span>   <span class="m">8232</span> S   2.7   0.7   0:00.18 php-fpm
+<span class="m">34283</span> daemon    <span class="m">20</span>   <span class="m">0</span>  <span class="m">227180</span>  <span class="m">14232</span>   <span class="m">8232</span> S   2.7   0.7   0:00.17 php-fpm
+    <span class="m">1</span> root      <span class="m">20</span>   <span class="m">0</span>  <span class="m">227180</span>  <span class="m">32524</span>  <span class="m">26752</span> S   0.3   1.6   0:00.57 php-fpm
+<span class="m">37036</span> daemon    <span class="m">20</span>   <span class="m">0</span>    <span class="m">4752</span>    <span class="m">104</span>      <span class="m">0</span> R   0.0   0.0   0:00.00 stress
+</code></pre></td></tr></table>
+</div>
+</div><p>分析：cpu使用率高，但是进程列表没有大的cpu使用进程，那为什么cou使用率高内？</p>
+<p><strong>步骤2</strong>. 用pidstat分析进程的CPU使用情况</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 间隔1s输出一组数据(按 Ctrl+C 结束)</span>
+$ pidstat <span class="m">1</span>
+<span class="c1"># 打印</span>
+Linux 4.19.76-linuxkit <span class="o">(</span>78890ee58ed3<span class="o">)</span> 	05/29/20 	_x86_64_	<span class="o">(</span><span class="m">4</span> CPU<span class="o">)</span>
+
+03:10:05      UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
+
+03:10:06      UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
+</code></pre></td></tr></table>
+</div>
+</div><p>分析：发现进程的cpu使用率也不高</p>
+<blockquote>
+<p>老炮儿分析：去运行top，观察一会儿，发现6个running状态的进程数，并且观察到php-fpm进程都处于Sleep状态；而处于running状态的进程却是今个stress</p>
+</blockquote>
+<p><strong>步骤3</strong>. 找一个stress进程进行分析
+<strong>在怀疑性能工 具出问题前，最好还是先用其他工具交叉确认一下</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 分析pid进程cpu</span>
+$ pidstat -p &lt;pid&gt;
+<span class="c1"># 从所有进程中查找PID是pid的进程</span>
+$ ps aux <span class="p">|</span> grep &lt;pid&gt;
+</code></pre></td></tr></table>
+</div>
+</div><p>这些进程在不停地重启，要么就是全 新的进程，这无非也就两个原因:</p>
+<p>第一个原因，进程在不停地崩溃重启，比如因为段错误、配置错误等等，这时，进程在退出后可能又被监控系统自动重启了。</p>
+<p>第二个原因，这些进程都是短时进程，也就是在其他应用内部通过exec调用的外面命令。这些命令一般都只运行很短的时间就会结束，你很难用top这种间隔时间比较长的工具发现(上面的案例，我们碰巧发现了)。</p>
+<p><strong>步骤4</strong>.pstree显示进程直接的关系</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ pstree <span class="p">|</span> grep stress
+php-fpm-+-4*<span class="o">[</span>php-fpm---sh---stress---stress<span class="o">]</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>分析：stress是被php-fpm调用的子进程，并且进程数量不止一个(这里是 3 个)。找到父进程后，我们能进入app的内部分析了</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 拷贝源码到本地</span>
+$ docker cp phpfpm:/app .
+<span class="c1"># grep 查找看看是不是有代码在调用 stress 命令</span>
+$ grep stress -r app
+app/index.php:// fake I/O with stress <span class="o">(</span>via write<span class="o">()</span>/unlink<span class="o">())</span>.
+app/index.php:<span class="nv">$result</span> <span class="o">=</span> exec<span class="o">(</span><span class="s2">&#34;/usr/local/bin/stress -t 1 -d 1 2&amp;gt;&amp;amp;1&#34;</span>, <span class="nv">$output</span>, <span class="nv">$status</span><span class="o">)</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>可以看到，果然是源码直接调用了stress，然后修改问题</p>
+<h3 id="34其他工具">3.4其他工具</h3>
+<blockquote>
+<p>perf 和 execsnoop</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"> <span class="c1"># 记录性能事件，等待大约 15 秒后按 Ctrl+C 退出</span> 
+ $ perf record -g
+ <span class="c1"># 查看报告</span>
+ $ perf report
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">Samples: 274K of event <span class="s1">&#39;cpu-clock&#39;</span>, Event count <span class="o">(</span>approx.<span class="o">)</span>: <span class="m">68743250000</span>
+      Self  Command      Shared Object         Symbol
+-   17.48%  stress       libc-2.28.so          <span class="o">[</span>.<span class="o">]</span> random                                         ◆
+   - 0.81% random                                                                                 ▒
+      - 0.74% 0xffffffffa8800a34                                                                  ▒
+         - 0.58% 0xffffffffa8003ad5                                                               ▒
+              0xffffffffa8003358                                                                  ▒
+-   15.19%  stress       libc-2.28.so          <span class="o">[</span>.<span class="o">]</span> random_r                                       ▒
+   - 0.69% random_r                                                                               ▒
+      - 0.62% 0xffffffffa8800a34                                                                  ▒
+         - 0.50% 0xffffffffa8003ad5                                                               ▒
+              0xffffffffa8003358                                                                  ▒
++    0.00%  swapper      <span class="o">[</span>unknown<span class="o">]</span>             <span class="o">[</span>k<span class="o">]</span> 0xffffffffa8800088                             ▒
++    0.00%  swapper      <span class="o">[</span>unknown<span class="o">]</span>             <span class="o">[</span>k<span class="o">]</span> 0xffffffffa8003c87
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="4总结">4.总结</h2>
+<ol>
+<li>分析性能问题时，最好能多工具结合分析
+vmstat pidstat top ps pstree execsnoop</li>
+<li>发现无法解释的cpu使用情况时：</li>
+</ol>
+<ul>
+<li>首先要想到有可能是短时应用导致的问题。</li>
+<li>应用里直接调用了其他二进制程序，这些程序通常运行时间比较短，通过top等工具也不容易发现。</li>
+<li>应用本身在不停地崩溃重启，而启动过程的资源初始化，很可能会占用相当多的 CPU。</li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">zhuyhan</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-05-29
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/linux/">Linux</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/linux_07/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">案例篇|07.系统中出现大量不可中断进程和僵尸进程怎么办? (上)</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/linux_05/">
+            <span class="next-text nav-default">基础篇|05.某个应用的CPU使用率居然达到100%，我该怎么办?</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+  <div id="vcomments"></div>
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+  <script type="text/javascript">
+    new Valine({
+        el: '#vcomments' ,
+        appId: 's8UQ8qUnOnRymf9kHAU0g2bK-gzGzoHsz',
+        appKey: 'bnjf212fgMPtFgiOzTcUeSpp',
+        notify:  false ,
+        verify:  false ,
+        avatar:'mm',
+        placeholder: '说点什么吧...',
+        visitor:  false 
+    });
+  </script>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:527747622@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/zhuyhan" class="iconfont icon-github" title="github"></a>
+  <a href="http://zhuyhan.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">olOwOlo</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

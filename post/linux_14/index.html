@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>第二周——CPU性能篇总结 - zhuyhan的个人博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="zhuyhan" /><meta name="description" content="看了一遍第一阶段的cpu性能篇，对cpu性能分析有一个大概的了解；由于遗忘的缘故，花了点时间重新阅读一遍，顺便写下第一阶段的总结。以前对li" /><meta name="keywords" content="blog, zhuyhan, 博客" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.69.0 with theme even" />
+
+
+<link rel="canonical" href="http://zhuyhan.github.io/post/linux_14/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="第二周——CPU性能篇总结" />
+<meta property="og:description" content="看了一遍第一阶段的cpu性能篇，对cpu性能分析有一个大概的了解；由于遗忘的缘故，花了点时间重新阅读一遍，顺便写下第一阶段的总结。以前对li" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://zhuyhan.github.io/post/linux_14/" />
+<meta property="article:published_time" content="2020-06-04T11:27:52+08:00" />
+<meta property="article:modified_time" content="2020-06-04T11:27:52+08:00" />
+<meta itemprop="name" content="第二周——CPU性能篇总结">
+<meta itemprop="description" content="看了一遍第一阶段的cpu性能篇，对cpu性能分析有一个大概的了解；由于遗忘的缘故，花了点时间重新阅读一遍，顺便写下第一阶段的总结。以前对li">
+<meta itemprop="datePublished" content="2020-06-04T11:27:52&#43;08:00" />
+<meta itemprop="dateModified" content="2020-06-04T11:27:52&#43;08:00" />
+<meta itemprop="wordCount" content="981">
+
+
+
+<meta itemprop="keywords" content="Linux," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="第二周——CPU性能篇总结"/>
+<meta name="twitter:description" content="看了一遍第一阶段的cpu性能篇，对cpu性能分析有一个大概的了解；由于遗忘的缘故，花了点时间重新阅读一遍，顺便写下第一阶段的总结。以前对li"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">zhuyhan</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">zhuyhan</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">第二周——CPU性能篇总结</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-06-04 </span>
+        <div class="post-category">
+            <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents"></nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>看了一遍第一阶段的cpu性能篇，对cpu性能分析有一个大概的了解；由于遗忘的缘故，花了点时间重新阅读一遍，顺便写下第一阶段的总结。以前对linux性能优化的场景没接触过，对运用linux上的软件(perf)可以直接分析出源码上的问题感到惊讶，这让我觉得学习这个专栏非常有必要的。</p>
+<p>那么什么是性能优化？随着应用负载的增加，系统资源的使用也会升到，有可能导致系统资源达到了瓶颈。我们要找出应用或者系统的瓶颈，并设法去避免缓解他们。</p>
+<p>总结了一下，第一阶段CPU性能篇的性能指标：</p>
+<p><strong>1.平均负载(Load Average)</strong></p>
+<ul>
+<li>平均负载：单位时间内，系统处于可运行状态和不可中断状态的平均进程数,也就是平均活跃进程数</li>
+<li>导致平均负载高的三个场景：cpu密集型、i/o密集型、大量进程</li>
+<li>分析工具：uptime、mpstat、pidstat</li>
+</ul>
+<p><strong>2.进程上下文切换</strong></p>
+<ul>
+<li>上下文切换：先把前一个任务的CPU上下文保存起来，然后加载新任务的上下文到这些寄存器和程序计数器中，最后再跳转到程序计数器所指的新位置，运行新任务。</li>
+<li>上线文切换：进程上下文切换、线程上下文切换、中断上下文切换</li>
+<li>指标：
+<ul>
+<li><strong>自愿上下文切换</strong>：无法获取资源导致</li>
+<li><strong>非自愿上下文切换</strong>：被系统强制调度导致</li>
+<li>分析工具：vmstat、pidstat(-w线程-t进程)、/proc/interrupts(中断)</li>
+</ul>
+</li>
+</ul>
+<p><strong>3.CPU使用率</strong></p>
+<ul>
+<li>cpu使用率：就是除了空闲时间外的其他时间占总CPU时间的百分比</li>
+<li>指标：
+<ul>
+<li><strong>用户CPU使用率</strong>：包括用户态 CPU 使用率(%user)和低优先级用户态 CPU 使用率 (%nice)</li>
+<li><strong>系统 CPU 使用率</strong>：(%system)表示 CPU 在内核态运行的时间百分比(不包括中断)。</li>
+<li><strong>等待 I/O 的CPU使用率</strong>：通常也称为 iowait
+<ul>
+<li>分析工具：top、ps、pidstat、perf、pstree、execsnoop</li>
+</ul>
+</li>
+<li><strong>软中断和硬中断的 CPU 使用率</strong>：中断是一种起步的事件处理机制，可以提高系统并发处理</li>
+<li>中断(%irq)、软中断(%softirq)</li>
+<li>软中断分析工具：ps、/proc/softirqs、/proc/interrupts、sar、tcpdump</li>
+<li>不可中断进程-分析工具：top、dstat、pidstat、perf</li>
+<li>僵尸进程-分析工具：top、pstree
+<strong>4.cpu缓存命中</strong></li>
+</ul>
+</li>
+</ul>
+<p>优化的方法：</p>
+<ol>
+<li><strong>应用层面</strong>：编译器优化、算法优化、异步处理、多线程代替多进程、善用缓存</li>
+<li><strong>系统优化</strong>：CPU 绑定、优先级调整、为进程设置资源限制、NUMA优化、中断负载均衡</li>
+</ol>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">zhuyhan</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-06-04
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/linux/">Linux</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/linux_15/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">基础篇|15.Linux内存是怎么工作的?</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/book_01/">
+            <span class="next-text nav-default">《娱乐至死》——尼尔·波兹曼</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+  <div id="vcomments"></div>
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+  <script type="text/javascript">
+    new Valine({
+        el: '#vcomments' ,
+        appId: 's8UQ8qUnOnRymf9kHAU0g2bK-gzGzoHsz',
+        appKey: 'bnjf212fgMPtFgiOzTcUeSpp',
+        notify:  false ,
+        verify:  false ,
+        avatar:'mm',
+        placeholder: '说点什么吧...',
+        visitor:  false 
+    });
+  </script>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:527747622@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/zhuyhan" class="iconfont icon-github" title="github"></a>
+  <a href="http://zhuyhan.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">olOwOlo</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

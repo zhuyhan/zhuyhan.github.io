@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>JOIN语句实现和优化 - zhuyhan的个人博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="zhuyhan" /><meta name="description" content="join语句会用到两个算法Index Nested-Loop和Block Nested—Loop;这里会介绍何时会用到这两种算法和优化方法 1.本" /><meta name="keywords" content="blog, zhuyhan, 博客" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.69.0 with theme even" />
+
+
+<link rel="canonical" href="http://zhuyhan.github.io/post/mysql_join/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="JOIN语句实现和优化" />
+<meta property="og:description" content="join语句会用到两个算法Index Nested-Loop和Block Nested—Loop;这里会介绍何时会用到这两种算法和优化方法 1.本" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://zhuyhan.github.io/post/mysql_join/" />
+<meta property="article:published_time" content="2020-04-25T23:45:14+08:00" />
+<meta property="article:modified_time" content="2020-04-25T23:45:14+08:00" />
+<meta itemprop="name" content="JOIN语句实现和优化">
+<meta itemprop="description" content="join语句会用到两个算法Index Nested-Loop和Block Nested—Loop;这里会介绍何时会用到这两种算法和优化方法 1.本">
+<meta itemprop="datePublished" content="2020-04-25T23:45:14&#43;08:00" />
+<meta itemprop="dateModified" content="2020-04-25T23:45:14&#43;08:00" />
+<meta itemprop="wordCount" content="1316">
+
+
+
+<meta itemprop="keywords" content="Mysql," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="JOIN语句实现和优化"/>
+<meta name="twitter:description" content="join语句会用到两个算法Index Nested-Loop和Block Nested—Loop;这里会介绍何时会用到这两种算法和优化方法 1.本"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">zhuyhan</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">zhuyhan</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">JOIN语句实现和优化</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-04-25 </span>
+        <div class="post-category">
+            <a href="/categories/mysql/"> Mysql </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1index-nested-loop-join">1.Index Nested-Loop Join</a></li>
+    <li><a href="#2block-nestedloop-join被驱动表用不上索引">2.Block Nested—Loop Join（被驱动表用不上索引）</a></li>
+    <li><a href="#3到底要不要用join">3.到底要不要用join？</a></li>
+    <li><a href="#4join优化">4.join优化</a>
+      <ul>
+        <li><a href="#1njl算法优化">1.NJL算法优化</a></li>
+        <li><a href="#2bnl转bka">2.BNL转BKA</a></li>
+      </ul>
+    </li>
+    <li><a href="#总结">总结</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <blockquote>
+<p>join语句会用到两个算法<code>Index Nested-Loop</code>和<code>Block Nested—Loop</code>;这里会介绍何时会用到这两种算法和优化方法</p>
+</blockquote>
+<blockquote>
+<p>1.本文参考极客时间《MySQL实战45讲》，用于个人复习总结
+2.为了实验测试，创建2个表t1,t2(表结构一样)，表结构在文章末尾</p>
+</blockquote>
+<h2 id="1index-nested-loop-join">1.Index Nested-Loop Join</h2>
+<blockquote>
+<p>用<code>explain</code>直接分析sql查询结果，<code>straight_join</code>让t1为驱动表，t2为被驱动表；因为t2.a字段有建索引，所以去表t2查找是直接走索引。</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">explain</span> <span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">t1</span> <span class="n">straight_join</span> <span class="n">t2</span> <span class="k">on</span> <span class="n">t1</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">t2</span><span class="p">.</span><span class="n">a</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="evernotecid://A8596967-EFAA-4FDE-88EB-1CD2AAAAB0F2/appyinxiangcom/16057268/ENResource/p1595" alt="4dabf07cb85361f75650f0be5730bede.png"></p>
+<p><strong>t1做为t2的驱动表，语句的执行流程是：</strong></p>
+<ol>
+<li>从表 t1 中读入一行数据 R;</li>
+<li>从数据行 R 中，取出 a 字段到表 t2 里去查找;</li>
+<li>取出表 t2 中满足条件的行，跟 R 组成一行，作为结果集的一部分;</li>
+<li>重复执行步骤 1 到 3，直到表 t1 的末尾循环结束。</li>
+</ol>
+<p><img src="evernotecid://A8596967-EFAA-4FDE-88EB-1CD2AAAAB0F2/appyinxiangcom/16057268/ENResource/p1596" alt="538dfff3bce1b22a340931ac09b1b002.png"></p>
+<p><strong>流程：</strong></p>
+<ol>
+<li>对驱动表 t1 做了全表扫描，这个过程需要扫描 100 行;</li>
+<li>而对于每一行 R，根据 a 字段去表 t2 查找，走的是树搜索过程。由于我们构造的数据
+都是一一对应的，因此每次的搜索过程都只扫描一行，也是总共扫描 100 行;</li>
+<li>所以，整个执行流程，总扫描行数是 200。</li>
+</ol>
+<h2 id="2block-nestedloop-join被驱动表用不上索引">2.Block Nested—Loop Join（被驱动表用不上索引）</h2>
+<blockquote>
+<p>用<code>explain</code>直接分析sql查询结果，由于表t2.b字段没有索引，每次去表t2匹配都要做一次全表扫描。</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">explain</span> <span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">t1</span> <span class="n">straight_join</span> <span class="n">t2</span> <span class="k">on</span> <span class="p">(</span><span class="n">t1</span><span class="p">.</span><span class="n">a</span><span class="o">=</span><span class="n">t2</span><span class="p">.</span><span class="n">b</span><span class="p">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="evernotecid://A8596967-EFAA-4FDE-88EB-1CD2AAAAB0F2/appyinxiangcom/16057268/ENResource/p1598" alt="a4c628f556950672a6f55b804c589327.png"></p>
+<p><strong>被驱动表上没有可用的索引，算法的流程是这样的:</strong></p>
+<ol>
+<li>把表 t1 的数据读入线程内存 join_buffer 中，由于我们这个语句中写的是 select * ，因 此是把整个表 t1 放入了内存;</li>
+<li>扫描表 t2，把表 t2 中的每一行取出来，跟 join_buffer 中的数据做对比，满足 join 条 件的，作为结果集的一部分返回。</li>
+</ol>
+<p><img src="evernotecid://A8596967-EFAA-4FDE-88EB-1CD2AAAAB0F2/appyinxiangcom/16057268/ENResource/p1597" alt="397297d691f93ad9594bed0971884d54.png"></p>
+<p><strong>join_buffer 的大小是由参数 join_buffer_size 设定的，默认值是 256k。</strong>
+<strong>执行过程就变成了:</strong></p>
+<ol>
+<li>扫描表 t1，顺序读取数据行放入 join_buffer 中，放完第 88 行 join_buffer 满了，继 续第 2 步;</li>
+<li>扫描表 t2，把 t2 中的每一行取出来，跟 join_buffer 中的数据做对比，满足 join 条件 的，作为结果集的一部分返回;</li>
+<li>清空 join_buffer;</li>
+<li>继续扫描表 t1，顺序读取最后的 12 行数据放入 join_buffer 中，继续执行第 2 步。</li>
+</ol>
+<h2 id="3到底要不要用join">3.到底要不要用join？</h2>
+<ol>
+<li>如果可以使用被驱动表的索引，join 语句还是有其优势的;</li>
+<li>不能使用被驱动表的索引，只能使用 Block Nested-Loop Join 算法，这样的语句就尽量不要使用;</li>
+<li>在使用 join 的时候，应该让小表做驱动表。</li>
+</ol>
+<h2 id="4join优化">4.join优化</h2>
+<p>Multi-Range Read 优化：（MRR）尽量使用顺序读盘；磁盘的读比较接近顺序读，能够提升读性能；</p>
+<h3 id="1njl算法优化">1.NJL算法优化</h3>
+<p>MySQL 在 5.6 版本后开始引入的 Batched Key Acess(BKA) 算法了,其实就是对 NLJ 算法的优化。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">set</span> <span class="n">optimizer_switch</span><span class="o">=</span><span class="s1">&#39;mrr=on,mrr_cost_based=off,batched_key_access=on&#39;</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="evernotecid://A8596967-EFAA-4FDE-88EB-1CD2AAAAB0F2/appyinxiangcom/16057268/ENResource/p1599" alt="9a5a48bc6e65e0cd9043a910c295bf87.png"></p>
+<h3 id="2bnl转bka">2.BNL转BKA</h3>
+<p>优化思路：</p>
+<ol>
+<li>把表 t2 中满足条件的数据放在临时表 tmp_t 中;</li>
+<li>为了让 join 使用 BKA 算法，给临时表 tmp_t 的字段 b 加上索引;</li>
+<li>让表 t1 和 tmp_t 做 join 操作。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">create</span> <span class="k">temporary</span> <span class="k">table</span> <span class="n">temp_t</span><span class="p">(</span><span class="n">id</span> <span class="nb">int</span> <span class="k">primary</span> <span class="k">key</span><span class="p">,</span> <span class="n">a</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b</span> <span class="nb">int</span><span class="p">,</span> <span class="k">index</span><span class="p">(</span><span class="n">b</span><span class="p">))</span><span class="n">engine</span><span class="o">=</span><span class="n">innodb</span><span class="p">;</span> 
+<span class="k">insert</span> <span class="k">into</span> <span class="n">temp_t</span> <span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">t2</span> <span class="k">where</span> <span class="n">b</span><span class="o">&gt;=</span><span class="mi">1</span> <span class="k">and</span> <span class="n">b</span><span class="o">&lt;=</span><span class="mi">2000</span><span class="p">;</span>
+<span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">t1</span> <span class="k">join</span> <span class="n">temp_t</span> <span class="k">on</span> <span class="p">(</span><span class="n">t1</span><span class="p">.</span><span class="n">b</span><span class="o">=</span><span class="n">temp_t</span><span class="p">.</span><span class="n">b</span><span class="p">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="总结">总结</h2>
+<ol>
+<li>BKA 优化是 MySQL 已经内置支持的，建议你默认使用;</li>
+<li>BNL 算法效率低，建议你都尽量转成 BKA 算法。优化的方向就是给被驱动表的关联字
+段加上索引;</li>
+<li>基于临时表的改进方案，对于能够提前过滤出小数据的 join 语句来说，效果还是很好
+的;</li>
+<li>MySQL 目前的版本还不支持 hash join，但你可以配合应用端自己模拟出来，理论上效
+果要好于临时表的方案。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="o">`</span><span class="n">t2</span><span class="o">`</span> <span class="p">(</span>
+ <span class="o">`</span><span class="n">id</span><span class="o">`</span> <span class="nb">int</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span> 
+ <span class="o">`</span><span class="n">a</span><span class="o">`</span> <span class="nb">int</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span> 
+ <span class="o">`</span><span class="n">b</span><span class="o">`</span> <span class="nb">int</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span> 
+ <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="p">(</span><span class="o">`</span><span class="n">id</span><span class="o">`</span><span class="p">),</span>
+ <span class="k">KEY</span> <span class="o">`</span><span class="n">a</span><span class="o">`</span> <span class="p">(</span><span class="o">`</span><span class="n">a</span><span class="o">`</span><span class="p">)</span> 
+<span class="p">)</span> 
+<span class="n">ENGINE</span><span class="o">=</span><span class="n">InnoDB</span><span class="p">;</span>
+<span class="k">drop</span> <span class="k">procedure</span> <span class="n">idata</span><span class="p">;</span> 
+<span class="k">delimiter</span> <span class="p">;;</span>
+<span class="k">create</span> <span class="k">procedure</span> <span class="n">idata</span><span class="p">()</span> 
+<span class="k">begin</span>
+<span class="k">declare</span> <span class="n">i</span> <span class="nb">int</span><span class="p">;</span> 
+<span class="k">set</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> 
+<span class="n">while</span><span class="p">(</span><span class="n">i</span><span class="o">&lt;=</span><span class="mi">1000</span><span class="p">)</span><span class="k">do</span>
+   <span class="k">insert</span> <span class="k">into</span> <span class="n">t2</span> <span class="k">values</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+   <span class="k">set</span> <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span> 
+<span class="k">end</span> <span class="n">while</span><span class="p">;</span>
+<span class="k">end</span><span class="p">;;</span> 
+<span class="k">delimiter</span> <span class="p">;</span> 
+<span class="k">call</span> <span class="n">idata</span><span class="p">();</span>
+
+<span class="k">create</span> <span class="k">table</span> <span class="n">t1</span> <span class="k">like</span> <span class="n">t2</span><span class="p">;</span>
+<span class="k">insert</span> <span class="k">into</span> <span class="n">t1</span> <span class="p">(</span><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">t2</span> <span class="k">where</span> <span class="n">id</span><span class="o">&lt;=</span><span class="mi">100</span><span class="p">);</span>
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">zhuyhan</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-04-25
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/mysql/">Mysql</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/linux_01/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">基础篇|02.平均负载</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/golang_model1/">
+            <span class="next-text nav-default">golang的并发模型</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+  <div id="vcomments"></div>
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+  <script type="text/javascript">
+    new Valine({
+        el: '#vcomments' ,
+        appId: 's8UQ8qUnOnRymf9kHAU0g2bK-gzGzoHsz',
+        appKey: 'bnjf212fgMPtFgiOzTcUeSpp',
+        notify:  false ,
+        verify:  false ,
+        avatar:'mm',
+        placeholder: '说点什么吧...',
+        visitor:  false 
+    });
+  </script>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:527747622@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/zhuyhan" class="iconfont icon-github" title="github"></a>
+  <a href="http://zhuyhan.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">olOwOlo</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

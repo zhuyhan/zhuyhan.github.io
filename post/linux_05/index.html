@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>基础篇|05.某个应用的CPU使用率居然达到100%，我该怎么办? - zhuyhan的个人博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="zhuyhan" /><meta name="description" content="Linux 作为一个多任务操作系统，将每个 CPU 的时间划分为很短的时间片，再通过调度器轮流分配给各个任务使用，因此造成多任务同时运行的错觉。 1.CPU使用" /><meta name="keywords" content="blog, zhuyhan, 博客" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.69.0 with theme even" />
+
+
+<link rel="canonical" href="http://zhuyhan.github.io/post/linux_05/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="基础篇|05.某个应用的CPU使用率居然达到100%，我该怎么办?" />
+<meta property="og:description" content="Linux 作为一个多任务操作系统，将每个 CPU 的时间划分为很短的时间片，再通过调度器轮流分配给各个任务使用，因此造成多任务同时运行的错觉。 1.CPU使用" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://zhuyhan.github.io/post/linux_05/" />
+<meta property="article:published_time" content="2020-05-29T01:23:42+08:00" />
+<meta property="article:modified_time" content="2020-05-29T01:23:42+08:00" />
+<meta itemprop="name" content="基础篇|05.某个应用的CPU使用率居然达到100%，我该怎么办?">
+<meta itemprop="description" content="Linux 作为一个多任务操作系统，将每个 CPU 的时间划分为很短的时间片，再通过调度器轮流分配给各个任务使用，因此造成多任务同时运行的错觉。 1.CPU使用">
+<meta itemprop="datePublished" content="2020-05-29T01:23:42&#43;08:00" />
+<meta itemprop="dateModified" content="2020-05-29T01:23:42&#43;08:00" />
+<meta itemprop="wordCount" content="1898">
+
+
+
+<meta itemprop="keywords" content="Linux," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="基础篇|05.某个应用的CPU使用率居然达到100%，我该怎么办?"/>
+<meta name="twitter:description" content="Linux 作为一个多任务操作系统，将每个 CPU 的时间划分为很短的时间片，再通过调度器轮流分配给各个任务使用，因此造成多任务同时运行的错觉。 1.CPU使用"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">zhuyhan</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">zhuyhan</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">基础篇|05.某个应用的CPU使用率居然达到100%，我该怎么办?</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-05-29 </span>
+        <div class="post-category">
+            <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1cpu使用率">1.CPU使用率</a>
+      <ul>
+        <li><a href="#11-节拍率hz">1.1 节拍率HZ</a></li>
+        <li><a href="#12-proc">1.2 /proc</a></li>
+        <li><a href="#13-cpu使用率公式">1.3 CPU使用率公式</a></li>
+      </ul>
+    </li>
+    <li><a href="#2怎么查看cpu使用率">2.怎么查看CPU使用率</a>
+      <ul>
+        <li><a href="#21-top">2.1 top</a></li>
+        <li><a href="#22-ps">2.2 ps</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-cpu使用率过高怎么办">3. CPU使用率过高怎么办?</a></li>
+    <li><a href="#4实验">4.实验</a>
+      <ul>
+        <li><a href="#41-坑与环境配置">4.1 坑与环境配置</a></li>
+        <li><a href="#42-实验场景">4.2 实验场景</a></li>
+      </ul>
+    </li>
+    <li><a href="#42-查找分析">4.2 查找分析</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <blockquote>
+<p>Linux 作为一个多任务操作系统，将每个 CPU 的时间划分为很短的时间片，再通过调度器轮流分配给各个任务使用，因此造成多任务同时运行的错觉。</p>
+</blockquote>
+<h2 id="1cpu使用率">1.CPU使用率</h2>
+<h3 id="11-节拍率hz">1.1 节拍率HZ</h3>
+<ul>
+<li>Linux通过事先定义的节拍率，触发时间中断</li>
+<li>使用全局变量Jiffies记录了开机以来的节拍数（中断+1）。</li>
+<li>在/boot/config查看内核选项;命令：<code>grep 'CONFIG_HZ=' /boot/config-$(uname -r)</code>（目前并没找到这个文件）</li>
+</ul>
+<h3 id="12-proc">1.2 /proc</h3>
+<p><strong>Linux通过/proc虚拟文件系统，向用户空间提供了系统内部状态的信息，而/proc/stat提供的就是系统的 CPU 和任务统计信息。</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 只保留各个 CPU 的数据</span>
+$ cat /proc/stat <span class="p">|</span> grep ^cpu
+<span class="c1"># 打印</span>
+cpu  <span class="m">72654</span> <span class="m">0</span> <span class="m">240530</span> <span class="m">37150942</span> <span class="m">231</span> <span class="m">0</span> <span class="m">408</span> <span class="m">0</span> <span class="m">0</span> <span class="m">0</span>
+cpu0 <span class="m">17980</span> <span class="m">0</span> <span class="m">58109</span> <span class="m">9280824</span> <span class="m">40</span> <span class="m">0</span> <span class="m">200</span> <span class="m">0</span> <span class="m">0</span> <span class="m">0</span>
+cpu1 <span class="m">18734</span> <span class="m">0</span> <span class="m">62739</span> <span class="m">9298874</span> <span class="m">67</span> <span class="m">0</span> <span class="m">81</span> <span class="m">0</span> <span class="m">0</span> <span class="m">0</span>
+cpu2 <span class="m">18220</span> <span class="m">0</span> <span class="m">63949</span> <span class="m">9265870</span> <span class="m">82</span> <span class="m">0</span> <span class="m">76</span> <span class="m">0</span> <span class="m">0</span> <span class="m">0</span>
+cpu3 <span class="m">17717</span> <span class="m">0</span> <span class="m">55731</span> <span class="m">9305373</span> <span class="m">41</span> <span class="m">0</span> <span class="m">49</span> <span class="m">0</span> <span class="m">0</span> <span class="m">0</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>每一列的涵义：</p>
+<ul>
+<li>user(通常缩写为 us)，代表用户态 CPU 时间。注意，它不包括下面的 nice 时间，但 包括了 guest 时间。</li>
+<li>nice(通常缩写为 ni)，代表低优先级用户态 CPU 时间，也就是进程的 nice 值被调整 为 1-19 之间时的 CPU 时间。这里注意，nice 可取值范围是 -20 到 19，数值越大，优 先级反而越低。</li>
+<li>system(通常缩写为 sys)，代表内核态 CPU 时间。</li>
+<li>idle(通常缩写为 id)，代表空闲时间。注意，它不包括等待 I/O 的时间(iowait)。</li>
+<li>iowait(通常缩写为 wa)，代表等待 I/O 的 CPU 时间。</li>
+<li>irq(通常缩写为 hi)，代表处理硬中断的 CPU 时间。</li>
+<li>softirq(通常缩写为 si)，代表处理软中断的 CPU 时间。</li>
+<li>steal(通常缩写为 st)，代表当系统运行在虚拟机中的时候，被其他虚拟机占用的 CPU 时间。</li>
+<li>guest(通常缩写为 guest)，代表通过虚拟化运行其他操作系统的时间，也就是运行虚 拟机的 CPU 时间。</li>
+<li>guest_nice(通常缩写为 gnice)，代表以低优先级运行虚拟机的时间。</li>
+</ul>
+<h3 id="13-cpu使用率公式">1.3 CPU使用率公式</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">CPU使用率 = 1-(空闲时间/总CPU时间)
+</code></pre></td></tr></table>
+</div>
+</div><p>事实上，性能工具一般都会取间隔一段时间(如3s)的两次值，作差后，再计算出这段时间内的平均CPU使用率</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">CPU使用率 = 1-{(空闲时间new-空闲时间old)/(总CPU时间new-总CPU时间old)}
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="2怎么查看cpu使用率">2.怎么查看CPU使用率</h2>
+<p>最常使用top和ps</p>
+<h3 id="21-top">2.1 top</h3>
+<blockquote>
+<p>top显示了系统总体的cpu和内存使用情况，以及各个进程的资源使用情况</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 默认每 3 秒刷新一次</span>
+$ top
+<span class="c1"># 打印</span>
+top - 10:12:12 up <span class="m">1</span> day,  2:48,  <span class="m">0</span> users,  load average: 0.00, <span class="m">0</span>
+Tasks:   <span class="m">7</span> total,   <span class="m">1</span> running,   <span class="m">6</span> sleeping,   <span class="m">0</span> stopped,   <span class="m">0</span> zo
+%Cpu<span class="o">(</span>s<span class="o">)</span>:  0.2 us,  0.6 sy,  0.0 ni, 99.2 id,  0.0 wa,  0.0 hi,
+MiB Mem :   1991.1 total,   1323.6 free,    314.2 used,    353.3
+MiB Swap:   1024.0 total,   1024.0 free,      0.0 used.   1549.4
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM
+    <span class="m">1</span> root      <span class="m">20</span>   <span class="m">0</span>    <span class="m">4112</span>   <span class="m">3276</span>   <span class="m">2848</span> S   0.0   0.2
+    <span class="m">8</span> root      <span class="m">20</span>   <span class="m">0</span>    <span class="m">4112</span>   <span class="m">3404</span>   <span class="m">2848</span> S   0.0   0.2
+   <span class="m">18</span> root      <span class="m">20</span>   <span class="m">0</span>    <span class="m">4112</span>   <span class="m">3428</span>   <span class="m">2876</span> S   0.0   0.2
+   <span class="m">39</span> root      <span class="m">20</span>   <span class="m">0</span>    <span class="m">4112</span>   <span class="m">3412</span>   <span class="m">2860</span> S   0.0   0.2
+   <span class="m">75</span> root      <span class="m">20</span>   <span class="m">0</span>    <span class="m">4112</span>   <span class="m">3420</span>   <span class="m">2868</span> S   0.0   0.2
+  <span class="m">283</span> root      <span class="m">20</span>   <span class="m">0</span>    <span class="m">4236</span>   <span class="m">3496</span>   <span class="m">2932</span> S   0.0   0.2
+  <span class="m">301</span> root      <span class="m">20</span>   <span class="m">0</span>    <span class="m">6072</span>   <span class="m">3236</span>   <span class="m">2736</span> R   0.0   0.2
+</code></pre></td></tr></table>
+</div>
+</div><p>分析：%CPU是系统使用率，后面一排是每隔进程的CPU使用率</p>
+<p><strong>需要使用pidstat分析每隔进程的详情情况</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 每隔 1 秒输出一组数据，共输出 5 组</span>
+$ pidstat <span class="m">1</span> <span class="m">5</span>
+<span class="c1"># 打印</span>
+Linux 4.19.76-linuxkit <span class="o">(</span>4f913ef1ae8f<span class="o">)</span> 	05/28/20 	_x86_64_	<span class="o">(</span><span class="m">4</span> CPU<span class="o">)</span>
+...
+10:22:12      UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
+10:22:13        <span class="m">0</span>       <span class="m">311</span>    0.00    0.99    0.00    0.00    0.99     <span class="m">3</span>  pidstat
+...
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="22-ps">2.2 ps</h3>
+<blockquote>
+<p>ps 则只显示了每个进程的资源使用情况。</p>
+</blockquote>
+<h2 id="3-cpu使用率过高怎么办">3. CPU使用率过高怎么办?</h2>
+<blockquote>
+<p>使用perf分析CPU性能问题。它以性能事件采样为基础，不仅可以分析系统的各种事 件和内核性能，还可以用来分析指定应用程序的性能问题。</p>
+</blockquote>
+<p><strong>1. docker中的ubuntu中安装perf</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># mac上docker run 要给权限</span>
+$ docker run -t -i --privileged --name ubuntu ubuntu
+<span class="c1"># 进入ubuntu容器内，安装</span>
+$ apt-get install linux-tools-generic
+<span class="c1"># 创建一个符号链接到/usr/bin/perf</span>
+$ ln -s /usr/lib/linux-tools/5.4.0-33-generic/perf /usr/bin/perf
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ perf top
+<span class="c1"># 打印</span>
+Samples: 85K of event <span class="s1">&#39;cpu-clock:pppH&#39;</span>, <span class="m">4000</span> Hz, Event count <span class="o">(</span>approx.<span class="o">)</span>: <span class="m">12867561796</span> lost: 0/0 drop: 0/0
+Overhead  Shared Object       Symbol
+  97.83%  <span class="o">[</span>kernel<span class="o">]</span>            <span class="o">[</span>k<span class="o">]</span> 0xffffffffa37f8223
+   0.35%  <span class="o">[</span>kernel<span class="o">]</span>            <span class="o">[</span>k<span class="o">]</span> 0xffffffffa314c746
+   0.34%  <span class="o">[</span>kernel<span class="o">]</span>            <span class="o">[</span>k<span class="o">]</span> 0xffffffffa3123a43
+   0.26%  <span class="o">[</span>kernel<span class="o">]</span>            <span class="o">[</span>k<span class="o">]</span> 0xffffffffa3108137
+ ...
+</code></pre></td></tr></table>
+</div>
+</div><p>分析：</p>
+<p>第一列 Overhead ，是该符号的性能事件在所有采样中的比例，用百分比来表示。</p>
+<p>第二列 Shared ，是该函数或指令所在的动态共享对象(Dynamic Shared Object)，如内核、进程名、动态链接库名、内核模块名等。</p>
+<p>第三列 Object ，是动态共享对象的类型。比如 [.] 表示用户空间的可执行程序、或者动态链接库，而 [k] 则表示内核空间。</p>
+<p>最后一列 Symbol是符号名，也就是函数名。当函数名未知时，用十六进制的地址来表示。</p>
+<h2 id="4实验">4.实验</h2>
+<h3 id="41-坑与环境配置">4.1 坑与环境配置</h3>
+<p>由于本地机子是macbook，无法安装perf(可能)，所以在运行php-fpm时要给容器赋予主机的权限</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ docker run --privileged --name phpfpm -itd --network container:nginx feisky/php-fpm:cpu
+</code></pre></td></tr></table>
+</div>
+</div><p>在phpfpm容器内安装perf</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ apt-get install -y linux-perf
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="42-实验场景">4.2 实验场景</h3>
+<ul>
+<li>系统的用户 CPU 使用率（usr%）过高</li>
+<li>可以找出高 CPU 使用率的进程（php-fpm 进程的 CPU 使用率过高）</li>
+</ul>
+<h2 id="42-查找分析">4.2 查找分析</h2>
+<ol>
+<li>使用<code>top</code>命令， 查看cpu使用率高的pid</li>
+<li>perf 分析</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># -g 开启调用关系分析，-p 指定 php-fpm 的进程号&lt;pid&gt;</span>
+$ perf top -g -p &lt;pid&gt;
+</code></pre></td></tr></table>
+</div>
+</div><p>然后就是上下左右键，查找调用了什么系统函数导致的，再去检测代码问题</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">zhuyhan</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-05-29
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/linux/">Linux</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/linux_06/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">案例篇|06.系统的CPU使用率很高，但为啥却找不到高CPU的应用?</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/linux_04/">
+            <span class="next-text nav-default">基础篇|04.经常说的 CPU 上下文切换是什么意思?(下)</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+  <div id="vcomments"></div>
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+  <script type="text/javascript">
+    new Valine({
+        el: '#vcomments' ,
+        appId: 's8UQ8qUnOnRymf9kHAU0g2bK-gzGzoHsz',
+        appKey: 'bnjf212fgMPtFgiOzTcUeSpp',
+        notify:  false ,
+        verify:  false ,
+        avatar:'mm',
+        placeholder: '说点什么吧...',
+        visitor:  false 
+    });
+  </script>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:527747622@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/zhuyhan" class="iconfont icon-github" title="github"></a>
+  <a href="http://zhuyhan.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">olOwOlo</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

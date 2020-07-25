@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>33.关于 Linux 网络，你必须知道这些(上) - zhuyhan的个人博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="zhuyhan" /><meta name="description" content="1. 网络模型 1.1 OSI网络模型 应用层 表示层 会话层 传输层 网络层 数据链路层 物理层 1.2 TCP/IP网络模型 应用层，负责向用户提供一组应用程序 传输层，负责" /><meta name="keywords" content="blog, zhuyhan, 博客" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.69.0 with theme even" />
+
+
+<link rel="canonical" href="http://zhuyhan.github.io/post/linux_33/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="33.关于 Linux 网络，你必须知道这些(上)" />
+<meta property="og:description" content="1. 网络模型 1.1 OSI网络模型 应用层 表示层 会话层 传输层 网络层 数据链路层 物理层 1.2 TCP/IP网络模型 应用层，负责向用户提供一组应用程序 传输层，负责" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://zhuyhan.github.io/post/linux_33/" />
+<meta property="article:published_time" content="2020-06-27T09:57:16+08:00" />
+<meta property="article:modified_time" content="2020-06-27T09:57:16+08:00" />
+<meta itemprop="name" content="33.关于 Linux 网络，你必须知道这些(上)">
+<meta itemprop="description" content="1. 网络模型 1.1 OSI网络模型 应用层 表示层 会话层 传输层 网络层 数据链路层 物理层 1.2 TCP/IP网络模型 应用层，负责向用户提供一组应用程序 传输层，负责">
+<meta itemprop="datePublished" content="2020-06-27T09:57:16&#43;08:00" />
+<meta itemprop="dateModified" content="2020-06-27T09:57:16&#43;08:00" />
+<meta itemprop="wordCount" content="705">
+
+
+
+<meta itemprop="keywords" content="Linux," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="33.关于 Linux 网络，你必须知道这些(上)"/>
+<meta name="twitter:description" content="1. 网络模型 1.1 OSI网络模型 应用层 表示层 会话层 传输层 网络层 数据链路层 物理层 1.2 TCP/IP网络模型 应用层，负责向用户提供一组应用程序 传输层，负责"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">zhuyhan</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">zhuyhan</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">33.关于 Linux 网络，你必须知道这些(上)</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-06-27 </span>
+        <div class="post-category">
+            <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-网络模型">1. 网络模型</a>
+      <ul>
+        <li><a href="#11-osi网络模型">1.1 OSI网络模型</a></li>
+        <li><a href="#12-tcpip网络模型">1.2 TCP/IP网络模型</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-linux网络栈">2. Linux网络栈</a></li>
+    <li><a href="#3-linux网络收发流程">3. Linux网络收发流程</a>
+      <ul>
+        <li><a href="#31-网络包的接收流程">3.1 网络包的接收流程</a></li>
+        <li><a href="#32-网络包的发送流程">3.2 网络包的发送流程</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="1-网络模型">1. 网络模型</h2>
+<h3 id="11-osi网络模型">1.1 OSI网络模型</h3>
+<ul>
+<li>应用层</li>
+<li>表示层</li>
+<li>会话层</li>
+<li>传输层</li>
+<li>网络层</li>
+<li>数据链路层</li>
+<li>物理层</li>
+</ul>
+<h3 id="12-tcpip网络模型">1.2 TCP/IP网络模型</h3>
+<ul>
+<li>应用层，负责向用户提供一组应用程序</li>
+<li>传输层，负责端到端的通信</li>
+<li>网络层，负责网络包的封装</li>
+<li>网络接口层，负责网络包在物理网络的传输</li>
+</ul>
+<h2 id="2-linux网络栈">2. Linux网络栈</h2>
+<p><img src="evernotecid://A8596967-EFAA-4FDE-88EB-1CD2AAAAB0F2/appyinxiangcom/16057268/ENResource/p1685" alt="c5360203b333426806cbe9e3abbfb5b2.png"></p>
+<h2 id="3-linux网络收发流程">3. Linux网络收发流程</h2>
+<h3 id="31-网络包的接收流程">3.1 网络包的接收流程</h3>
+<ol>
+<li>当一个网络帧到达网卡后，网卡会通过DMA方式，把网络包放在收放队列中；然后通过硬中断，告诉中断处理程序已经收到网络包</li>
+<li>网卡中断处理程序会为网络帧分配内核数据结构，并将其拷贝到sk_buff缓冲区中，通知内核收到新的网络帧</li>
+<li>内核协议栈从缓冲区中取出网络帧，并通过网络帧协议，从下到上处理网络帧</li>
+<li>链路层检查报文的合法性，找到上层协议类型，去掉帧头、帧尾</li>
+<li>网络层取出ip头，判断网络包下一步的走向，比如交给上层处理还是转发。但确认网络层这个包是要发送到本机，就会去掉ip头，再提交传输层</li>
+<li>传输层取出TCP或UDP头后，根据&lt;源IP、源端口、目的IP、目的端口&gt;四元组为标识，找到对应的socket，并把数据拷贝到socket的接收缓存中
+<img src="evernotecid://A8596967-EFAA-4FDE-88EB-1CD2AAAAB0F2/appyinxiangcom/16057268/ENResource/p1688" alt="f84c6d24d7ccaf98638d1b749d462180.png"></li>
+</ol>
+<h3 id="32-网络包的发送流程">3.2 网络包的发送流程</h3>
+<ol>
+<li>首先，应用程序调用socket API发送网络包（这是一个系统调用，所以会陷入到内核态的套接字层中。套接字层会把数据包放到socket发送缓冲区中）</li>
+<li>网络协议栈从socket发送缓冲区中，取出数据包；再按照TCP/IP栈，从上到下逐层处理</li>
+<li>分片后的网络包，再发送到网络接口，进行物理地址寻址，以找到下一个的MAC地址。然后添加帧头和帧尾，放到发包队列中。这一切完成后，会有软中断通知驱动程序:发包队列中有新的网络帧需要发送。</li>
+<li>驱动程序通过 DMA ，从发包队列中读出网络帧，并通过物理网卡把它发送出去。</li>
+</ol>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">zhuyhan</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-06-27
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/linux/">Linux</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/linux_34/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">34.关于 Linux 网络，你必须知道这些(下)</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/linux_week4/">
+            <span class="next-text nav-default">第四周 ——I/O性能(23~32)</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+  <div id="vcomments"></div>
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+  <script type="text/javascript">
+    new Valine({
+        el: '#vcomments' ,
+        appId: 's8UQ8qUnOnRymf9kHAU0g2bK-gzGzoHsz',
+        appKey: 'bnjf212fgMPtFgiOzTcUeSpp',
+        notify:  false ,
+        verify:  false ,
+        avatar:'mm',
+        placeholder: '说点什么吧...',
+        visitor:  false 
+    });
+  </script>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:527747622@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/zhuyhan" class="iconfont icon-github" title="github"></a>
+  <a href="http://zhuyhan.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">olOwOlo</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

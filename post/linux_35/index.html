@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>35.基础篇|C10K 和 C1000K 回顾 - zhuyhan的个人博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="zhuyhan" /><meta name="description" content="C10K 就是单机同时处理 1 万个请 求(并发连接 1 万)的问题，而 C1000K 也就是单机支持处理 100 万个请求(并发连接 100 万)的问题。 I/O 模型优化 两种I/O事件通知的方" /><meta name="keywords" content="blog, zhuyhan, 博客" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.69.0 with theme even" />
+
+
+<link rel="canonical" href="http://zhuyhan.github.io/post/linux_35/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="35.基础篇|C10K 和 C1000K 回顾" />
+<meta property="og:description" content="C10K 就是单机同时处理 1 万个请 求(并发连接 1 万)的问题，而 C1000K 也就是单机支持处理 100 万个请求(并发连接 100 万)的问题。 I/O 模型优化 两种I/O事件通知的方" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://zhuyhan.github.io/post/linux_35/" />
+<meta property="article:published_time" content="2020-07-06T18:09:20+08:00" />
+<meta property="article:modified_time" content="2020-07-06T18:09:20+08:00" />
+<meta itemprop="name" content="35.基础篇|C10K 和 C1000K 回顾">
+<meta itemprop="description" content="C10K 就是单机同时处理 1 万个请 求(并发连接 1 万)的问题，而 C1000K 也就是单机支持处理 100 万个请求(并发连接 100 万)的问题。 I/O 模型优化 两种I/O事件通知的方">
+<meta itemprop="datePublished" content="2020-07-06T18:09:20&#43;08:00" />
+<meta itemprop="dateModified" content="2020-07-06T18:09:20&#43;08:00" />
+<meta itemprop="wordCount" content="901">
+
+
+
+<meta itemprop="keywords" content="Linux," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="35.基础篇|C10K 和 C1000K 回顾"/>
+<meta name="twitter:description" content="C10K 就是单机同时处理 1 万个请 求(并发连接 1 万)的问题，而 C1000K 也就是单机支持处理 100 万个请求(并发连接 100 万)的问题。 I/O 模型优化 两种I/O事件通知的方"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">zhuyhan</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">zhuyhan</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">35.基础篇|C10K 和 C1000K 回顾</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-07-06 </span>
+        <div class="post-category">
+            <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#io-模型优化">I/O 模型优化</a></li>
+    <li><a href="#解决">解决</a>
+      <ul>
+        <li><a href="#1c10k">1.C10K</a></li>
+        <li><a href="#2c100k">2.C100K</a></li>
+        <li><a href="#3c1000k">3.C1000K</a></li>
+        <li><a href="#4c10m">4.C10M</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <blockquote>
+<p>C10K 就是单机同时处理 1 万个请 求(并发连接 1 万)的问题，而 C1000K 也就是单机支持处理 100 万个请求(并发连接 100 万)的问题。</p>
+</blockquote>
+<h2 id="io-模型优化">I/O 模型优化</h2>
+<p><strong>两种I/O事件通知的方式:水平触发和边缘触发</strong></p>
+<ul>
+<li>水平触发：只要文件描述符可以非阻塞地执行I/O，就会触发通知。也就是说，应用程序可以随时检查描述符的状态，然后再根据状态，进行I/O操作</li>
+<li>边缘触发：只有在文件描述符的状态发生改变(也就是 I/O 请求达到)时，才发送一次通知。</li>
+</ul>
+<p><strong>I/O多路复用的方法</strong></p>
+<ul>
+<li>第一种，使用非阻塞I/O和水平触发通知，比如使用select或者poll
+<ul>
+<li>select使用固定长度的位向量，表示文件描述符集合，因此会有最大描述符数量的限制；O(n^2)</li>
+<li>poll改进select的表示方法，换成一个没有固定长度的数组，这样就没最大描述符数量的限制;O(n)</li>
+</ul>
+</li>
+<li>第二种，使用非阻塞I/O和边缘触发通知，比如epoll
+<ul>
+<li>epoll使用红黑树，在内核中管理文件描述符的集合。这样就不需要应用程序在每次操作时传入、传出集合</li>
+<li>epoll使用时间驱动机制，只关注I/O事件发生的文件描述符，不需要轮询扫描整个集合</li>
+</ul>
+</li>
+<li>第三种，使用异步I/O（AIO）：异步 I/O 允许应用程序同时发起很多 I/O 操作，而不用等待这些操作完成</li>
+</ul>
+<p><strong>工作模型优化</strong></p>
+<ul>
+<li>第一种，主进程+多个worker子进程
+<ul>
+<li>主进程执行bind()+listen()后，创建多个子进程</li>
+<li>然后，每个子进程都通过accept()和epoll_wait()，来处理相同的套接字</li>
+</ul>
+</li>
+<li>第二种，监听相同端口的多进程模型</li>
+</ul>
+<h2 id="解决">解决</h2>
+<h3 id="1c10k">1.C10K</h3>
+<p>问题根源：</p>
+<ol>
+<li>一方面 在于系统资源有限</li>
+<li>另一方面 同步阻塞的I/O模型以及轮询的套接字接口，限制了网络事件处理的效率</li>
+</ol>
+<p>解决：
+Linux2.6 引入的epoll</p>
+<h3 id="2c100k">2.C100K</h3>
+<p>解决：可能只需要增加系统的物理资源就可以满足</p>
+<h3 id="3c1000k">3.C1000K</h3>
+<p>解决：</p>
+<ol>
+<li>不仅仅是增加物理资源就能解决的问题了</li>
+<li>就需要多方面的优化工作 了，从硬件的中断处理和网络功能卸载、到网络协议栈的文件描述符数量、连接状态跟 踪、缓存队列等内核的优化，再到应用程序的工作模型优化，都是考虑的重点。</li>
+</ol>
+<h3 id="4c10m">4.C10M</h3>
+<ol>
+<li>就不只是增加物理资源，或者优化内核和应用程序可以解决的问题了。</li>
+<li>这时候，就需要用 XDP 的方式，在内核协议栈之前处理网络包;</li>
+<li>或者用 DPDK 直接跳过网络协议栈，在用户空间通过轮询的方式直接处理网络包。</li>
+</ol>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">zhuyhan</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-07-06
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/linux/">Linux</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/linux_36/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">36.套路篇|怎么评估系统的网络性能?</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/linux_34/">
+            <span class="next-text nav-default">34.关于 Linux 网络，你必须知道这些(下)</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+  <div id="vcomments"></div>
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+  <script type="text/javascript">
+    new Valine({
+        el: '#vcomments' ,
+        appId: 's8UQ8qUnOnRymf9kHAU0g2bK-gzGzoHsz',
+        appKey: 'bnjf212fgMPtFgiOzTcUeSpp',
+        notify:  false ,
+        verify:  false ,
+        avatar:'mm',
+        placeholder: '说点什么吧...',
+        visitor:  false 
+    });
+  </script>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:527747622@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/zhuyhan" class="iconfont icon-github" title="github"></a>
+  <a href="http://zhuyhan.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">olOwOlo</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

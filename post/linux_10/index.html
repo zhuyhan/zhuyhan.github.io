@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>案例篇|10.系统的软中断CPU使用率升高，我该怎么办? - zhuyhan的个人博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="zhuyhan" /><meta name="description" content="案例 工具 sar是一个系统活动报告工作，既可以实时查看系统的当前活动，又可以配置保存和报告历史统计数据 hping3 是一个可以构造 TCP/IP 协议数据包的工具，可以" /><meta name="keywords" content="blog, zhuyhan, 博客" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.69.0 with theme even" />
+
+
+<link rel="canonical" href="http://zhuyhan.github.io/post/linux_10/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="案例篇|10.系统的软中断CPU使用率升高，我该怎么办?" />
+<meta property="og:description" content="案例 工具 sar是一个系统活动报告工作，既可以实时查看系统的当前活动，又可以配置保存和报告历史统计数据 hping3 是一个可以构造 TCP/IP 协议数据包的工具，可以" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://zhuyhan.github.io/post/linux_10/" />
+<meta property="article:published_time" content="2020-05-31T11:07:50+08:00" />
+<meta property="article:modified_time" content="2020-05-31T11:07:50+08:00" />
+<meta itemprop="name" content="案例篇|10.系统的软中断CPU使用率升高，我该怎么办?">
+<meta itemprop="description" content="案例 工具 sar是一个系统活动报告工作，既可以实时查看系统的当前活动，又可以配置保存和报告历史统计数据 hping3 是一个可以构造 TCP/IP 协议数据包的工具，可以">
+<meta itemprop="datePublished" content="2020-05-31T11:07:50&#43;08:00" />
+<meta itemprop="dateModified" content="2020-05-31T11:07:50&#43;08:00" />
+<meta itemprop="wordCount" content="858">
+
+
+
+<meta itemprop="keywords" content="Linux," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="案例篇|10.系统的软中断CPU使用率升高，我该怎么办?"/>
+<meta name="twitter:description" content="案例 工具 sar是一个系统活动报告工作，既可以实时查看系统的当前活动，又可以配置保存和报告历史统计数据 hping3 是一个可以构造 TCP/IP 协议数据包的工具，可以"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">zhuyhan</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">zhuyhan</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">案例篇|10.系统的软中断CPU使用率升高，我该怎么办?</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-05-31 </span>
+        <div class="post-category">
+            <a href="/categories/linux%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98%E7%AC%94%E8%AE%B0/"> 《Linux性能优化实战》笔记 </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#案例">案例</a></li>
+    <li><a href="#总结">总结</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="案例">案例</h2>
+<p><strong>工具</strong></p>
+<ul>
+<li>sar是一个系统活动报告工作，既可以实时查看系统的当前活动，又可以配置保存和报告历史统计数据</li>
+<li>hping3 是一个可以构造 TCP/IP 协议数据包的工具，可以对系统进行安全审计、防火墙测试等。</li>
+<li>tcpdump 是一个常用的网络抓包工具，常用来分析各种网络问题。</li>
+</ul>
+<p><strong>安装工具</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ apt-get install sysstat hping3 tcpdump
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>操作分析：</strong>
+<strong>步骤1.</strong> 在第一个终端开启nginx，并检查是否正常开启</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># 运行 Nginx 服务并对外开放 8080 端口</span>
+$ docker run -itd --name<span class="o">=</span>nginx -p 80:8080 nginx
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>步骤2.</strong> 在第二个终端，运行hping3命令，模拟nginx的客户端请求
+(<code>docker.for.mac.host.internal</code>为容器请求宿主机的地址)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">$ hping3 -S -p <span class="m">8080</span> -i u100 docker.for.mac.host.internal
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>步骤3.</strong> 分析</p>
+<ol>
+<li>在第一个终端执行命令 top</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">Processes: <span class="m">374</span> total, <span class="m">4</span> running, <span class="m">1</span> stuck, <span class="m">369</span> sleeping, <span class="m">1485</span> threads                           14:05:26
+Load Avg: 4.07, 2.65, 1.95  CPU usage: 9.16% user, 42.46% sys, 48.37% idle
+SharedLibs: 231M resident, 66M data, 36M linkedit.
+MemRegions: <span class="m">38000</span> total, 1782M resident, 171M private, 3301M shared.
+PhysMem: 8100M used <span class="o">(</span>1788M wired<span class="o">)</span>, 90M unused.
+VM: 1740G vsize, 1992M framework vsize, 4414<span class="o">(</span>64<span class="o">)</span> swapins, 152514<span class="o">(</span>0<span class="o">)</span> swapouts.
+Networks: packets: 1528667/100M in, 1566257/102M out. Disks: 158537/3132M read, 40820/1237M written.
+
+PID   COMMAND      %CPU  TIME     <span class="c1">#TH    #WQ  #PORT MEM    PURG   CMPRS  PGRP PPID STATE</span>
+<span class="m">790</span>   com.docker.h 162.0 06:54.55 17/1   <span class="m">0</span>    <span class="m">40</span>    2496M+ 0B     85M-   <span class="m">738</span>  <span class="m">785</span>  running
+<span class="m">228</span>   symptomsd    95.9  00:23.21 3/1    2/1  <span class="m">84</span>    5612K  0B     2740K  <span class="m">228</span>  <span class="m">1</span>    running
+<span class="m">0</span>     kernel_task  52.0  02:35.77 206/9  <span class="m">0</span>    <span class="m">0</span>     91M-   0B     0B     <span class="m">0</span>    <span class="m">0</span>    running
+</code></pre></td></tr></table>
+</div>
+</div><p>2.在第一个终端运行sar命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># -n DEV 表示显示网络收发的报告，间隔 1 秒输出一组数据</span> 
+$ sar -n DEV <span class="m">1</span>
+打印
+IFACE rxpck/s txpck/s rxkB/s txkB/s rxcmp/s txcmp/s rxmcs 
+eth0 12607.00 6304.00 664.86 358.11 0.00 0.00 <span class="m">0</span> 
+docker0 6302.00 12604.00 270.79 664.66 0.00 0.00 <span class="m">0</span> 
+lo 0.00 0.00 0.00 0.00 0.00 0.00 <span class="m">0</span>
+veth9f6bbcd 6302.00 12604.00 356.95 664.66 0.00 0.00
+</code></pre></td></tr></table>
+</div>
+</div><p>分析：
+rxpck/s 和 txpck/s 分别表示每秒接收、发送的网络帧数，也就是 PPS
+rxkB/s 和 txkB/s 分别表示每秒接收、发送的千字节数，也就是 BPS</p>
+<p>对网卡 eth0 来说，每秒接收的网络帧数比较大，达到了 12607，而发送的网络帧数则 比较小，只有 6304;
+每秒接收的千字节数只有 664 KB，而发送的千字节数更小，只有 358 KB。</p>
+<p>3.在第一个终端运行tcpdump命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># -i eth0 只抓取 eth0 网卡，-n 不解析协议名和主机名</span>
+<span class="c1"># tcp port 80 表示只抓取 tcp 协议并且端口号为 8080 的网络帧</span>
+$ tcpdump -i eth0 -n tcp port <span class="m">8080</span>
+<span class="c1"># 打印</span>
+06:05:38.908736 IP 172.17.0.1.55372 &gt; 172.17.0.2.80: Flags <span class="o">[</span>F.<span class="o">]</span>, seq 807309568, ack 807308582, win 229, options <span class="o">[</span>nop,nop,TS val <span class="m">3353161100</span> ecr 1354799123<span class="o">]</span>, length <span class="m">0</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>分析：表示网络帧从172.17.0.1.55372转发到172.17.0.2的80端口</p>
+<h2 id="总结">总结</h2>
+<p>软中断 CPU 使用率(softirq)升高是一种很常见的性能问题.
+碰到网络性能问题，优先使用sar和tcpdump，感觉tcpdump在网络抓包上面非常好用</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">zhuyhan</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-05-31
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/linux/">Linux</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/linux_11/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">套路篇|11.如何迅速分析出系统CPU的瓶颈在哪里?</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/linux_09/">
+            <span class="next-text nav-default">基础篇|09.怎么理解Linux软中断?</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+  <div id="vcomments"></div>
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+  <script type="text/javascript">
+    new Valine({
+        el: '#vcomments' ,
+        appId: 's8UQ8qUnOnRymf9kHAU0g2bK-gzGzoHsz',
+        appKey: 'bnjf212fgMPtFgiOzTcUeSpp',
+        notify:  false ,
+        verify:  false ,
+        avatar:'mm',
+        placeholder: '说点什么吧...',
+        visitor:  false 
+    });
+  </script>
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:527747622@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/zhuyhan" class="iconfont icon-github" title="github"></a>
+  <a href="http://zhuyhan.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">olOwOlo</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
